@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Details</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        /* Custom styles can be added here */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="center-align">Assignment Details</h1>
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><%= assignments[0].ASSIGNMENT_NAME %></span>
+                        <p><strong>Due Date:</strong> <%= assignments[0].SUBMISSION_DEADLINE %></p>
+                        <p><strong>Created By:</strong> <%= assignments[0].TEACHER_ID %></p>
+                        <p><strong>Total Marks:</strong> <%= assignments[0].TOTAL_MARKS %></p>
+                        <p><strong>Topic Name:</strong> <%= assignments[0].TOPIC_NAME %></p>
+                        <p><strong>Level Marks:</strong> <%= assignments[0].LEVEL_NAME %></p>
+                        <!-- Add any additional details you want to display about the assignment -->
+                    </div>
+                    <div class="card-action">
+                        <!-- Link to download the assignment PDF -->
+                        <a href="/teacher/assignments/<%= assignments[0].ASSIGNMENT_ID %>/download" class="waves-effect waves-light btn">Download Assignment PDF</a>
+                        <!-- Button to upload assignment question PDF -->
+                        <form id="upload-form" action="/teacher/assignments/<%= assignments[0].ASSIGNMENT_ID %>/upload-question" method="POST" enctype="multipart/form-data">
+                            <div class="file-field input-field">
+                                <div class="btn">
+                                    <span>Add Assignment Question PDF</span>
+                                    <input id="file-upload" type="file" name="assignmentQuestionPdf" disabled>
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" type="text">
+                                </div>
+                            </div>
+                            <button type="submit" class="waves-effect waves-light btn">Upload</button>
+                        </form>
+                        <!-- Update Assignment form -->
+                        <div class="row">
+                            <form id="update-assignment-form" class="col s12">
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <label for="new-deadline">New Submission Deadline</label>
+                                        <input id="new-deadline" type="datetime-local" class="validate">
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input id="new-mark" type="text" class="validate">
+                                        <label for="new-mark">New Mark</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <button type="submit" class="waves-effect waves-light btn">Update Assignment</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h2>Submitted Assignments</h2>
+        <% submittedAssignments.forEach(function(submittedAssignment) { %>
+            <div class="row">
+                <div class="col s12">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title"><%= submittedAssignment.STUDENT_ID %></span>
+                            <p><strong>Student ID:</strong> <%= submittedAssignment.STUDENT_ID %></p>
+                            <p><strong>Submitted Date:</strong> <%= submittedAssignment.SUBMISSION_TIME %></p>
+                            <!-- Add any additional details you want to display about the submitted assignment -->
+                        </div>
+                        <div class="card-action">
+                            <!-- Link to download the assignment answer PDF -->
+                            <a href="/teacher/assignments/<%= submittedAssignment.ASSIGNMENT_ID %>/students/<%= submittedAssignment.STUDENT_ID %>/download" class="waves-effect waves-light btn">Download Assignment Answer</a>
+                            <!-- Text field for entering marks -->
+                            <div class="input-field">
+                                <input id="mark_<%= submittedAssignment.STUDENT_ID %>" type="text" class="validate">
+                                <label for="mark_<%= submittedAssignment.STUDENT_ID %>">Enter Mark</label>
+                            </div>
+                            <!-- Submit mark button -->
+                            <button class="waves-effect waves-light btn submit-mark-btn" data-student-id="<%= submittedAssignment.STUDENT_ID %>">Submit Mark</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- Client-side JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const submissionDeadline = new Date('<%= assignments[0].SUBMISSION_DEADLINE %>');
+            const currentDateTime = new Date();
+            const uploadForm = document.getElementById('upload-form');
+            const fileUpload = document.getElementById('file-upload');
+
+            if (submissionDeadline < currentDateTime) {
+                uploadForm.style.display = 'none'; // Hide the upload form if deadline is over
+            } else {
+                fileUpload.disabled = false; // Enable file upload if deadline is not over
+            }
+
+            const submitButtons = document.querySelectorAll('.submit-mark-btn');
+
+            submitButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.dataset.studentId;
+                    const mark = document.getElementById(`mark_${studentId}`).value;
+
+                    fetch('/teacher/assignments/<%= assignments[0].ASSIGNMENT_ID %>/submit-mark', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            studentId: studentId,
+                            mark: mark
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Mark submitted successfully');
+                        } else {
+                            alert('Failed to submit mark');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to submit mark');
+                    });
+                });
+            });
+
+            // Update Assignment form submission
+            document.getElementById('update-assignment-form').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                
+                const newDeadline = document.getElementById('new-deadline').value;
+                const newMark = document.getElementById('new-mark').value;
+                
+                // Perform validation if needed
+
+                // Send data to server
+                fetch(`/teacher/assignments/<%= assignments[0].ASSIGNMENT_ID %>/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        newDeadline: newDeadline,
+                        newMark: newMark
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Assignment updated successfully');
+                        // Refresh the page or perform any other action as needed
+                    } else {
+                        alert('Failed to update assignment');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update assignment');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

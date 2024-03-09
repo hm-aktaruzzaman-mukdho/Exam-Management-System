@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Question</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+
+<body>
+
+    <div class="blue darken-2 white-text" style="padding: 10px; text-align: center;">
+        <h1>Create Question</h1>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <form class="col s12" id="questionForm">
+                <div class="input-field col s12">
+                    <select id="questionType" name="questionType" required onchange="updateForm()">
+                        <option value="" disabled selected>Select Question Type</option>
+                        <% question_types.forEach(function(type) { %>
+                        <option value="<%= type.TYPE_NAME %>"><%= type.TYPE_DESCRIPTION %></option>
+                        <% }); %>
+                    </select>
+                    <label for="questionType">Question Type</label>
+                </div>
+                <div class="input-field col s12">
+                    <input id="questionBody" type="text" class="validate" required>
+                    <label for="questionBody">Question Body</label>
+                </div>
+                <div id="options" class="row">
+                    <!-- Options will be dynamically added here based on question type -->
+                </div>
+                <div class="input-field col s12">
+                    <input id="correctAnswer" type="text" class="validate" required>
+                    <label for="correctAnswer">Correct Answer</label>
+                </div>
+                <div class="input-field col s12 m6">
+                    <select id="academicLevel" name="academicLevel" required>
+                        <option value="" disabled selected>Select Academic Level</option>
+                        <% academicLevels.forEach(function(level) { %>
+                        <option value="<%= level.LEVEL_NAME %>"><%= level.LEVEL_NAME %></option>
+                        <% }); %>
+                    </select>
+                    <label for="academicLevel">Academic Level</label>
+                </div>
+                <div class="input-field col s12 m6">
+                    <select id="topicName" name="topicName" required>
+                        <option value="" disabled selected>Select Topic Name</option>
+                        <% topics.forEach(function(topic) { %>
+                        <option value="<%= topic.TOPIC_NAME %>"><%= topic.TOPIC_NAME %></option>
+                        <% }); %>
+                    </select>
+                    <label for="topicName">Topic Name</label>
+                </div>
+                <div class="col s12">
+                    <button class="btn waves-effect waves-light" type="button" onclick="createQuestion()">Create Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Materialize select dropdowns
+            var elems = document.querySelectorAll('select');
+            var instances = M.FormSelect.init(elems);
+        });
+
+        function updateForm() {
+            var questionType = document.getElementById('questionType').value;
+            var optionsDiv = document.getElementById('options');
+            var correctAnswerDiv = document.getElementById('correctAnswer').parentNode; // Get the parent div of the correctAnswer input field
+        
+            optionsDiv.innerHTML = ''; // Clear previous options
+        
+            if (questionType === 'MCQ') {
+                // Display input boxes for 4 options
+                for (var i = 1; i <= 4; i++) {
+                    var optionInput = document.createElement('div');
+                    optionInput.className = 'input-field col s12 m6';
+                    optionInput.innerHTML = `
+                        <input id="option${i}" type="text" class="validate" required>
+                        <label for="option${i}">Option ${i}</label>`;
+                    optionsDiv.appendChild(optionInput);
+                }
+                // Show correctAnswer div
+                correctAnswerDiv.style.display = 'block';
+            } else if (questionType === 'TF') {
+                // Display dropdown menu for true/false options
+                var trueFalseInput = document.createElement('div');
+                trueFalseInput.className = 'input-field col s12';
+                trueFalseInput.innerHTML = `
+                    <select id="option1" name="option1" required>
+                        <option value="" disabled selected>Select Correct Answer</option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                    </select>
+                    <label>Correct Answer</label>`;
+                optionsDiv.appendChild(trueFalseInput);
+                // Hide correctAnswer div
+                correctAnswerDiv.style.display = 'none';
+            } else if (questionType === 'FIB') {
+                // Hide options for fill-in-the-blank questions
+                // Hide correctAnswer div
+                correctAnswerDiv.style.display = 'block'; // If you want to show the correctAnswer div for FIB questions, set it to 'block'
+            }
+            // Reinitialize Materialize select dropdowns
+            M.FormSelect.init(document.querySelectorAll('select'));
+        }
+        
+
+        function createQuestion() {
+            // Fetch values from input fields
+            const questionType = document.getElementById('questionType').value;
+            const questionBody = document.getElementById('questionBody').value;
+            const correctAnswer = document.getElementById('correctAnswer').value;
+            const academicLevel = document.getElementById('academicLevel').value;
+            const topicDropdown = document.getElementById('topicName');
+            const selectedTopic = topicDropdown.value;
+
+            // Fetch options based on question type
+            var options = [];
+            if (questionType === 'MCQ') {
+                for (var i = 1; i <= 4; i++) {
+                    var optionValue = document.getElementById(`option${i}`).value;
+                    options.push(optionValue);
+                }
+            } else if (questionType === 'TF') {
+                var optionValue = document.getElementById('option1').value;
+                options.push(optionValue);
+            } else if (questionType === 'FIB') {
+                // No options for fill-in-the-blank questions
+            }
+
+            if (questionType == '' || questionBody == '' || correctAnswer == '' || academicLevel == '') {
+                alert("Please enter data on all fields.");
+                //return;
+            }
+
+            // Send data to the server using fetch or another method
+            // Example using fetch:
+            fetch('/teacher/create-question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        questionType,
+                        questionBody,
+                        options,
+                        correctAnswer,
+                        academicLevel,
+                        selectedTopic,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle response from the server
+                    console.log('Question created successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Error creating question:', error);
+                });
+        }
+    </script>
+
+</body>
+
+</html>

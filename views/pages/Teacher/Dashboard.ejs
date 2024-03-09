@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Page</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+    
+        #header {
+            background-color: #004985;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #main-container {
+            display: flex;
+            align-items: stretch;
+            height: calc(100% - 60px);
+            width: 100%;
+        }
+    
+        #options-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 20px;
+            background-color: #fff;
+            border-right: 1px solid #e0e0e0;
+            width: 15%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: calc(100vh - 60px);
+        }
+    
+        .option {
+            padding: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+            background-color: #fff;
+            color: #333;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .option:hover {
+            background-color: #9aaeb4;
+        }
+    
+        #content-container {
+            padding: 20px;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h1>Teacher Dashboard</h1>
+        <p>Welcome to the Teacher Page!</p>
+        <p><a href="/" style="align-items:right; color: #fff; text-decoration: none;">Go to Home page</a></p>
+    </div>
+
+    <div id="main-container">
+
+        <div id="options-container">
+            <div class="option" onclick="redirectTo('/teacher/modify-topic-subject')">
+                <span class="material-icons">format_list_bulleted</span>
+                <span>Subjects and Topics</span>
+            </div>
+            <div class="option" onclick="redirectTo('/teacher/question-creation')">
+                <span class="material-icons">add_circle_outline</span>
+                <span>Add Questions</span>
+            </div>
+            <div class="option" onclick="redirectTo('/teacher/create-question-set')">
+                <span class="material-icons">create</span>
+                <span>Create Question Set</span>
+            </div>
+            <div class="option" onclick="redirectTo('/teacher/exams')">
+                <span class="material-icons">library_books</span>
+                <span>View Exams</span>
+            </div>
+            <div class="option" onclick="redirectTo('/teacher/create-exam')">
+                <span class="material-icons">playlist_add</span>
+                <span>Create Exams</span>
+            </div>
+            <div class="option" onclick="redirectTo('/teacher/assignments')">
+                <span class="material-icons">assignment</span>
+                <span>Assignments</span>
+            </div>
+            <div class="option" onclick="redirectTo('/teacher/create-assignment')">
+                <span class="material-icons">add_to_queue</span>
+                <span>Create Assignment</span>
+            </div>
+            <div class="option" onclick="redirectTo('/teacher/profile')">
+                <span class="material-icons">person</span>
+                <span>Profile</span>
+            </div>
+            <!-- Add more options as needed -->
+        </div>
+
+        <div id="content-container">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+
+    </div>
+
+    <script>
+        function redirectTo(page) {
+            // Redirect to the specified page
+            window.location.href = page;
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Page</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            height: 100vh;
+        }
+
+        #navbar {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #main-container {
+            display: flex;
+            align-items: stretch;
+            height: calc(100% - 60px);
+        }
+
+        #options-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 20px;
+            background-color: #fff;
+            border-right: 1px solid #e0e0e0;
+            width: 15%;
+            overflow-y: auto;
+            /* Added */
+        }
+
+        .option {
+            padding: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+            background-color: #fff;
+            color: #333;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Prevents long text from breaking layout */
+            white-space: nowrap;
+            /* Prevents text from wrapping */
+            text-overflow: ellipsis;
+            /* Display ellipsis for overflow text */
+        }
+
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .material-icons {
+            margin-right: 8px;
+        }
+
+        #content-container {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        #search-container {
+            display: none;
+            flex-direction: row;
+            align-items: center;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        #search-field {
+            padding: 5px;
+            margin-right: 5px;
+        }
+
+        #search-button {
+            padding: 8px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar">
+        <h1>Student Home Page</h1>
+    </div>
+
+    <div id="main-container">
+
+        <div id="options-container">
+            <div class="option" onclick="viewTopics()">
+                <span class="material-icons">menu_book</span>
+                <span>View Topics</span>
+            </div>
+            <div class="option" onclick="toggleSearchContainer()">
+                <span class="material-icons">search</span>
+                <span>Search Topics</span>
+            </div>
+            <div class="option" onclick="viewSubjects()">
+                <span class="material-icons">subject</span>
+                <span>View Subjects</span>
+            </div>
+            <div class="option" onclick="viewPracticeQuestions()">
+                <span class="material-icons">question_answer</span>
+                <span>Practice Questions</span>
+            </div>
+            <div class="option" onclick="createExams()">
+                <span class="material-icons">assignment_turned_in</span>
+                <span>Create Exams</span>
+            </div>
+            <div class="option" onclick="viewExams()">
+                <span class="material-icons">assignment_turned_in</span>
+                <span>View Exams</span>
+            </div>
+            <div class="option" onclick="viewAssignments()">
+                <span class="material-icons">assignment</span>
+                <span>View Assignments</span>
+            </div>
+            <div class="option" onclick="viewProfile()">
+                <span class="material-icons">person</span>
+                <span>Profile</span>
+            </div>
+        </div>
+
+        <div id="content-container">
+            <!-- Content will be dynamically loaded here -->
+            <div>
+                <h1>Topics</h1>
+                <div>
+                    <% topics.forEach(function(topic) { %>
+                        <div>
+                            <%= topic.TOPIC_NAME %>
+                        </div>
+                        <% }); %>
+                </div>
+
+                <h1>Subjects</h1>
+                <div>
+                    <% subjects.forEach(function(subject) { %>
+                        <div>
+                            <%= subject.SUBJECT_NAME %>
+                        </div>
+                        <% }); %>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="search-container">
+        <input type="text" id="search-field" placeholder="Enter topic name">
+        <button id="search-button" onclick="searchTopics()">Search</button>
+    </div>
+
+    <script>
+        function viewTopics() {
+            // Make an asynchronous request to fetch topics from the server
+            fetch('/get-all-topics')
+                .then(response => response.json())
+                .then(data => {
+                    const contentContainer = document.getElementById('content-container');
+                    contentContainer.innerHTML = `<h2>TOPICS</h2>`;
+
+                    if (Array.isArray(data)) {
+                        // If data is an array, display as a vertical list
+                        const list = document.createElement('ul');
+                        data.forEach(item => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = item.TOPIC_NAME + ' -- ' + item.TOPIC_DESCRIPTION;
+                            list.appendChild(listItem);
+                        });
+                        contentContainer.appendChild(list);
+                    } else {
+                        // If data is not an array, display a message
+                        const message = document.createElement('p');
+                        message.textContent = 'No data available.';
+                        contentContainer.appendChild(message);
+                    }
+                })
+                .catch(error => console.error('Error fetching topics:', error));
+        }
+
+        function searchTopics() {
+            const searchField = document.getElementById('search-field');
+            const searchTerm = searchField.value.trim();
+
+            // Check if the search term is not empty
+            if (searchTerm !== '') {
+                // Make an asynchronous request to search topics with the given term
+                fetch('/search-topics', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ searchTerm })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const contentContainer = document.getElementById('content-container');
+                        contentContainer.innerHTML = `<h2>Search Results for '${searchTerm}'</h2>`;
+
+                        if (Array.isArray(data)) {
+                            // If data is an array, display as a vertical list
+                            const list = document.createElement('ul');
+                            data.forEach(item => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = item.TOPIC_NAME + ' -- ' + item.TOPIC_DESCRIPTION;
+                                list.appendChild(listItem);
+                            });
+                            contentContainer.appendChild(list);
+                        } else {
+                            // If data is not an array, display a message
+                            const message = document.createElement('p');
+                            message.textContent = 'No data available.';
+                            contentContainer.appendChild(message);
+                        }
+                    })
+                    .catch(error => console.error('Error searching topics:', error));
+            } else {
+                alert('Please enter a search term.');
+            }
+        }
+
+        function viewSubjects() {
+            // Make an asynchronous request to fetch subjects from the server
+            fetch('/get-subjects')
+                .then(response => response.json())
+                .then(data => {
+                    displayDataInContainer(data, 'Subjects');
+                })
+                .catch(error => console.error('Error fetching subjects:', error));
+        }
+
+        function viewQuestionsByTopic() {
+            window.location.href = '/questions';
+        }
+
+        function viewPracticeQuestions() {
+            window.location.href = '/student/questions';
+        }
+
+        function createExams() {
+            window.location.href = '/student/create-exam';
+        }
+
+        function viewExams() {
+            window.location.href = '/student/exams';
+        }
+
+        function viewAssignments() {
+            window.location.href = '/student/assignments';
+        }
+
+        function viewProfile() {
+            window.location.href = '/student/profile';
+        }
+
+        function displayDataInContainer(data, title) {
+            // Display the data in the content container
+            const contentContainer = document.getElementById('content-container');
+            contentContainer.innerHTML = `<h2>${title}</h2>`;
+
+            if (Array.isArray(data)) {
+                // If data is an array, display as a vertical list
+                const list = document.createElement('ul');
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = item.name; // Modify to match the data structure
+                    list.appendChild(listItem);
+                });
+                contentContainer.appendChild(list);
+            } else {
+                // If data is not an array, display a message
+                const message = document.createElement('p');
+                message.textContent = 'No data available.';
+                contentContainer.appendChild(message);
+            }
+        }
+
+        function toggleSearchContainer() {
+            // Toggle the visibility of the search container
+            const searchContainer = document.getElementById('search-container');
+            searchContainer.style.display = searchContainer.style.display === 'none' ? 'flex' : 'none';
+        }
+    </script>
+
+</body>
+
+</html>

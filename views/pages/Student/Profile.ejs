@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: #004985;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 40px;
+            background-color: #daf7fd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 12px);
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        .readonly {
+            background-color: #f9f9f9;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div id="header">
+        <h2>Edit Profile</h2>
+    </div>
+
+    <!-- Content -->
+    <div class="container">
+        <form id="editForm">
+            <div class="input-field">
+                <input type="text" id="firstName" name="firstName" value="<%= student[0].FIRST_NAME %>" required>
+                <label for="firstName"><strong>First Name</strong></label>
+            </div>
+
+            <div class="input-field">
+                <input type="text" id="lastName" name="lastName" value="<%= student[0].LAST_NAME %>" required>
+                <label for="lastName"><strong>Last Name</strong></label>
+            </div>
+
+            <div class="input-field">
+                <input type="password" id="password" name="password" required>
+                <label for="password"><strong>Password</strong></label>
+            </div>
+
+            <div class="input-field">
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <label for="confirmPassword"><strong>Confirm Password</strong></label>
+                <span id="passwordError" class="error-message"></span>
+            </div>
+
+            <div class="readonly"><strong>Student ID:</strong> <%= student[0].STUDENT_ID %></div>
+            <div class="readonly"><strong>Email: </strong><%= student[0].EMAIL %></div>
+            <div class="readonly"><strong>Age:</strong> <%= student[0].AGE %></div>
+            <div class="readonly"><strong>Level Name:</strong> <%= student[0].LEVEL_NAME %></div>
+            <div class="readonly"><strong>Registered Date:</strong> <%= student[0].REGISTERED_DATE %></div>
+
+            <button type="submit" id="saveChangesButton">Save Changes</button>
+        </form>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Materialize Form Inputs
+            M.updateTextFields();
+
+            // Handle Form Submission
+            document.getElementById('editForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+
+                // Check if passwords match
+                const password = formData.get('password');
+                const confirmPassword = formData.get('confirmPassword');
+                if (password !== confirmPassword) {
+                    document.getElementById('passwordError').textContent = "Passwords do not match";
+                    return;
+                }
+
+                // If passwords match, send data to server
+                fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // Optionally, handle successful response
+                            console.log('Profile updated successfully');
+                        } else {
+                            // Optionally, handle error response
+                            console.error('Failed to update profile');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            // Check if passwords match on input change
+            document.getElementById('confirmPassword').addEventListener('input', function () {
+                const password = document.getElementById('password').value;
+                const confirmPassword = this.value;
+                const passwordError = document.getElementById('passwordError');
+
+                if (password !== confirmPassword) {
+                    passwordError.textContent = "Passwords do not match";
+                    document.getElementById('saveChangesButton').disabled = true;
+                } else {
+                    passwordError.textContent = "";
+                    document.getElementById('saveChangesButton').disabled = false;
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

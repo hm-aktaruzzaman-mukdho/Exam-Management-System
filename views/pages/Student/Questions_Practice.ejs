@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Forms Submission with MCQs</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        header .head1 {
+            font-size: 40px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2ecc71;
+        }
+
+        header .head2 {
+            font-size: 18px;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        .left-section {
+            width: 20%; /* Updated width */
+            background-color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .left-section select {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .right-section {
+            flex: 1;
+            padding: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form p {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        button {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #27ae60;
+        }
+
+        #timer {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        footer .foot1 {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="head1">EXAM MANAGEMENT SYSTEM</div>
+        <div class="head2">An exam management system for students and teachers of all kinds</div>
+    </header>
+
+    <div class="main-content">
+        <div class="left-section">
+            <select id="topicSelect">
+                <option value="">Select Topic</option>
+                <!-- Injected options will be placed here -->
+            </select>
+            <select id="subjectSelect">
+                <option value="">Select Subject</option>
+                <!-- Injected options will be placed here -->
+            </select>
+            <button id="fetchQuestionsButton" onclick="fetchQuestions()">Fetch Questions</button>
+            <button id="submitBtn">Submit All Forms</button>
+            <p><a href="/student" style="color: #3f51b5; text-decoration: none;">Back to Student Page</a></p>
+        </div>
+
+        <div class="right-section">
+            <div id="timer">02:00</div>
+            <% questioncollections.forEach( question =>{ %>
+            <form id="form1">
+                <p>QUESTION:<%=question.QUESTION_BODY%></p>
+                <label for="q1_option1"><input type="radio" id="q1_option1" name="<%=question.QUESTION_ID %>"
+                        value="<%=question.OPTION_1 %>"> <%=question.OPTION_1 %></label>
+                <label for="q1_option2"><input type="radio" id="q1_option2" name="<%=question.QUESTION_ID %>"
+                        value="<%=question.OPTION_2 %>"> <%=question.OPTION_2 %></label>
+                <label for="q1_option3"><input type="radio" id="q1_option3" name="<%=question.QUESTION_ID %>"
+                        value="<%=question.OPTION_3 %>"> <%=question.OPTION_3 %></label>
+                <label for="q1_option4"><input type="radio" id="q1_option4" name="<%=question.QUESTION_ID %>"
+                        value="<%=question.OPTION_4 %>"> <%=question.OPTION_4 %></label>
+            </form>
+            <% }) %>
+        </div>
+    </div>
+
+    <footer>
+        <div class="foot1">&copy; Exam Managment System</div>
+    </footer>
+
+    <script>
+        let timerDisplay = document.getElementById("timer");
+        let totalTime = 10; // 2 minutes in seconds
+        let manualSubmit = false;
+
+
+        function fetchQuestions() {
+            // Make an asynchronous request to fetch questions from the server
+            window.location.href = '/student/get-all-questions';
+        }
+
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            if (totalTime <= 0) {
+                alert("Time is up!\n You can not submit anything")
+            }
+            else {
+                manualSubmit = true;
+                submitAllForms();
+            }
+        });
+
+        function submitAllForms() {
+            var formDataArray = [];
+
+            var forms = document.querySelectorAll('form');
+
+            forms.forEach(function (form) {
+                var formData = {};
+                var inputs = form.querySelectorAll('input[type="radio"]:checked');
+
+                inputs.forEach(function (input) {
+                    formData["QURSTION_ID"] = input.name;
+                    formData["GIVEN_ANSWER"] = input.value;
+                });
+
+                formDataArray.push(formData);
+            });
+
+            var jsonData = JSON.stringify(formDataArray);
+
+            // Send jsonData to the server
+            fetch('/student/submit-exam-answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Form data submitted successfully!');
+                    } else {
+                        console.error('Failed to submit form data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

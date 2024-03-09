@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Question Set</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #navbar {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #navbar a {
+            text-decoration: none;
+            color: #fff;
+            margin: 0 10px;
+        }
+
+        #navbar a:hover {
+            background-color: #2980b9;
+        }
+
+        #container {
+            flex-grow: 1;
+            display: flex;
+            padding: 20px;
+        }
+
+        #sidebar {
+            width: 20%;
+            padding: 20px;
+        }
+
+        #main-content {
+            width: 80%;
+            padding-left: 20px; /* Add left padding to compensate for sidebar width */
+        }
+
+        #top-section {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        input[type="text"] {
+            width: 50px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Custom checkbox styles */
+        .checkbox-container {
+            position: relative;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #eee;
+            border-radius: 3px;
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #2196F3;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-container .checkmark:after {
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar">
+        <h2>Create Question Set</h2>
+        <a href="/teacher" class="waves-effect waves-light btn">Teacher Home Page</a>
+    </div>
+
+    <div id="top-section" class="container">
+        <div class="row">
+            <div class="input-field col s8">
+                <input id="questionSetName" type="text" class="validate" required>
+                <label for="questionSetName">Question Set Name</label>
+            </div>
+            <div class="input-field col s4">
+                <a class="waves-effect waves-light btn" onclick="createQuestionSet()">Create Question Set</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <a class="waves-effect waves-light btn" onclick="searchQuestionsByTopic()">Search Questions by Topic</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="container" class="container">
+        <div id="sidebar">
+            <h3>Topics</h3>
+            <ul class="collection">
+                <% topics.forEach(function(topic) { %>
+                    <li class="collection-item">
+                        <label class="checkbox-container">
+                            <input type="checkbox" name="selectedTopics" value="<%= topic.id %>">
+                            <span><%= topic.TOPIC_NAME %></span>
+                            <span class="checkmark"></span>
+                        </label>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+
+        <div id="main-content">
+            <div class="section">
+                <h4>Selected Questions</h4>
+                <form id="selectedQuestionsForm">
+                    <table class="striped">
+                        <thead>
+                            <tr>
+                                <th>Question Body</th>
+                                <th>Select</th>
+                                <th>Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="selectedQuestionsBody">
+                            <!-- Selected questions will be appended here -->
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+
+            <div class="section">
+                <h4>Unselected Questions</h4>
+                <form id="unselectedQuestionsForm">
+                    <table class="striped">
+                        <thead>
+                            <tr>
+                                <th>Question Body</th>
+                                <th>Select</th>
+                                <th>Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="unselectedQuestionsBody">
+                            <% questions.forEach(function(question) { %>
+                                <tr>
+                                    <td><%= question.body %></td>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="unselectedQuestions" value="<%= question.id %>">
+                                            <span></span>
+                                        </label>
+                                    </td>
+                                    <td><input type="number" name="marks" placeholder="Marks" required></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        // Initialize Materialize components
+        M.AutoInit();
+
+        // Function to move selected questions to selected section
+        function moveToSelectedQuestions(questionId, questionBody) {
+            var selectedQuestionsBody = document.getElementById('selectedQuestionsBody');
+            var tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${questionBody}</td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="selectedQuestions" value="${questionId}" checked>
+                        <span></span>
+                    </label>
+                </td>
+                <td><input type="number" name="marks" placeholder="Marks" required></td>
+            `;
+            selectedQuestionsBody.appendChild(tr);
+        }
+
+        // Function to move unselected questions to unselected section
+        function moveToUnselectedQuestions(questionId, questionBody) {
+            var unselectedQuestionsBody = document.getElementById('unselectedQuestionsBody');
+            var tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${questionBody}</td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="unselectedQuestions" value="${questionId}">
+                        <span></span>
+                    </label>
+                </td>
+                <td><input type="number" name="marks" placeholder="Marks" required></td>
+            `;
+            unselectedQuestionsBody.appendChild(tr);
+        }
+
+        // Example data - replace with actual data from server-side rendering
+        var questions = <%= JSON.stringify(questions) %>;
+
+        // Populate unselected questions initially
+        questions.forEach(function(question) {
+            moveToUnselectedQuestions(question.QUESTION_ID, question.QUESTION_BODY);
+        });
+
+        // Add event listeners to checkboxes to move questions between sections
+        document.addEventListener('change', function(event) {
+            var target = event.target;
+            if (target.type === 'checkbox' && (target.name === 'selectedQuestions' || target.name === 'unselectedQuestions')) {
+                var questionId = target.value;
+                var questionBody = target.parentNode.parentNode.parentNode.firstElementChild.textContent.trim();
+                if (target.checked) {
+                    if (target.name === 'selectedQuestions') {
+                        // If moved from selected to unselected
+                        target.name = 'unselectedQuestions';
+                        moveToUnselectedQuestions(questionId, questionBody);
+                        target.checked = false;
+                        target.parentNode.parentNode.remove();
+                    } else {
+                        // If moved from unselected to selected
+                        target.name = 'selectedQuestions';
+                        moveToSelectedQuestions(questionId, questionBody);
+                        target.checked = true;
+                        target.parentNode.parentNode.remove();
+                    }
+                } else {
+                    if (target.name === 'selectedQuestions') {
+                        // If unselected from selected
+                        target.name = 'unselectedQuestions';
+                        moveToUnselectedQuestions(questionId, questionBody);
+                        target.checked = false;
+                        target.parentNode.parentNode.remove();
+                    } else {
+                        // If unselected from unselected
+                        target.name = 'selectedQuestions';
+                        moveToSelectedQuestions(questionId, questionBody);
+                        target.checked = true;
+                        target.parentNode.parentNode.remove();
+                    }
+                }
+            }
+        });
+
+        function createQuestionSet() {
+            var selectedQuestionsForm = document.getElementById('selectedQuestionsForm');
+            var formData = new FormData(selectedQuestionsForm);
+            var selectedQuestions = [];
+            formData.getAll('selectedQuestions').forEach(function(questionId) {
+                selectedQuestions.push(questionId);
+            });
+            var questionSetName = document.getElementById('questionSetName').value;
+            var confirmation = confirm("Are you sure you want to create this question set?");
+            if (confirmation) {
+                var data = {
+                    questionSetName: questionSetName,
+                    selectedQuestions: selectedQuestions
+                };
+                fetch('/create-question-set', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to create question set.');
+                    }
+                })
+                .then(data => {
+                    alert("Question set created successfully!");
+                    console.log('Question set created:', data);
+                })
+                .catch(error => {
+                    console.error('Error creating question set:', error);
+                    alert("Failed to create question set. Please try again.");
+                });
+            }
+        }
+
+        function searchQuestionsByTopic() {
+            var selectedTopics = [];
+            document.querySelectorAll('input[name="selectedTopics"]:checked').forEach(function(checkbox) {
+                selectedTopics.push(checkbox.value);
+            });
+            if (selectedTopics.length === 0) {
+                alert("Please select at least one topic.");
+            } else {
+                // Send selectedTopics to the server via POST request
+                // Implement this according to your server-side logic
+                console.log('Selected Topics:', selectedTopics);
+            }
+        }
+    </script>
+
+</body>
+
+</html>

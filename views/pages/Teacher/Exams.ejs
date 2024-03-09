@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Exams</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Material Theme CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: #004985;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #79eee7;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div id="header">
+        <h2>All Exams</h2>
+    </div>
+
+    <!-- Content -->
+    <div class="container">
+
+        <h3>Ongoing Exams</h3>
+        <button onclick="toggleTable('ongoing')">Show Table</button>
+        <table id="ongoing-table">
+            <thead>
+                <tr>
+                    <th>Exam ID</th>
+                    <th>Exam Type</th>
+                    <th>Scheduled By</th>
+                    <th>Question Set ID</th>
+                    <th>Exam Date</th>
+                    <th>Level Name</th>
+                    <th>Remaining Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% exams.forEach(exam => { %>
+                    <% const examTime = new Date(exam.EXAM_TIME); %>
+                    <% const examDurationMinutes = exam.EXAM_DURATION; %>
+                    <% const endTime = new Date(examTime.getTime() + examDurationMinutes * 60000); %>
+                    <% const currentTime = new Date(); %>
+                    <% if (currentTime >= examTime && currentTime <= endTime) { %>
+                        <tr onclick="redirectToExamDetails('<%= exam.EXAM_ID %>')" style="cursor: pointer;">
+                            <td><%= exam.EXAM_ID %></td>
+                            <td><%= exam.EXAM_TYPE %></td>
+                            <td><%= exam.SCHEDULED_BY %></td>
+                            <td><%= exam.QUESTION_SET_ID %></td>
+                            <td><%= exam.EXAM_TIME %></td>
+                            <td><%= exam.LEVEL_NAME %></td>
+                            <td id="remaining-time-<%= exam.EXAM_ID %>"></td> <!-- Leave it empty initially -->
+                        </tr>
+                    <% } %>
+                <% }); %>
+            </tbody>
+        </table>
+
+
+        <h3>Upcoming Exams</h3>
+        <button onclick="toggleTable('upcoming')">Show Table</button>
+        <table id="upcoming-table">
+            <thead>
+                <tr>
+                    <th>Exam ID</th>
+                    <th>Exam Type</th>
+                    <th>Scheduled By</th>
+                    <th>Question Set ID</th>
+                    <th>Exam Date</th>
+                    <th>Level Name</th>
+                    <th>Remaining Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% exams.forEach(exam => { %>
+                    <% if (new Date(exam.EXAM_TIME) >= new Date()) { %>
+                        <tr onclick="redirectToExamDetails('<%= exam.EXAM_ID %>')" style="cursor: pointer;">
+                            <td><%= exam.EXAM_ID %></td>
+                            <td><%= exam.EXAM_TYPE %></td>
+                            <td><%= exam.SCHEDULED_BY %></td>
+                            <td><%= exam.QUESTION_SET_ID %></td>
+                            <td><%= exam.EXAM_TIME %></td>
+                            <td><%= exam.LEVEL_NAME %></td>
+                            <td id="remaining-time-upcoming-<%= exam.EXAM_ID %>"></td> <!-- Leave it empty initially -->
+                        </tr>
+                    <% } %>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h3>Past Exams</h3>
+        <button onclick="toggleTable('past')">Show Table</button>
+        <table id="past-table">
+            <thead>
+                <tr>
+                    <th>Exam ID</th>
+                    <th>Exam Type</th>
+                    <th>Scheduled By</th>
+                    <th>Question Set ID</th>
+                    <th>Exam Date</th>
+                    <th>Level Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% exams.forEach(exam => { %>
+                    <% const examTime = new Date(exam.EXAM_TIME); %>
+                    <% const examDurationMinutes = exam.EXAM_DURATION; %>
+                    <% const endTime = new Date(examTime.getTime() + examDurationMinutes * 60000); %>
+                    <% const currentTime = new Date(); %>
+                    <% if (currentTime >= examTime && currentTime > endTime) { %>
+                        <tr onclick="redirectToExamDetails('<%= exam.EXAM_ID %>')" style="cursor: pointer;">
+                            <td><%= exam.EXAM_ID %></td>
+                            <td><%= exam.EXAM_TYPE %></td>
+                            <td><%= exam.SCHEDULED_BY %></td>
+                            <td><%= exam.QUESTION_SET_ID %></td>
+                            <td><%= exam.EXAM_TIME %></td>
+                            <td><%= exam.LEVEL_NAME %></td>
+                        </tr>
+                    <% } %>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        function redirectToExamDetails(examId) {
+            window.location.href = '/teacher/exams/' + examId; // Replace '/exam/' with the actual route for exam details
+        }
+
+        function formatRemainingTime(startTime, endTime) {
+            var diff = Math.abs(endTime - startTime) / 1000; // Difference in seconds
+
+            if(diff==0)
+            {
+                window.location.reload();
+            }
+
+            var days = Math.floor(diff / 86400); // 1 day = 86400 seconds
+            var hours = Math.floor((diff % 86400) / 3600); // 1 hour = 3600 seconds
+            var minutes = Math.floor(((diff % 86400) % 3600) / 60); // 1 minute = 60 seconds
+            var seconds = Math.floor(((diff % 86400) % 3600) % 60);
+
+            if (days > 0) {
+                return days + " days, " + hours + " hours, " + minutes + " minutes";
+            } 
+            else {
+                return hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+            }
+        }
+
+        function toggleTable(tableId) {
+            var table = document.getElementById(tableId + '-table');
+            table.classList.toggle('hide');
+        }
+
+        // Function to update remaining time every second
+        function updateRemainingTime() {
+            var currentTime = new Date();
+            <% exams.forEach(exam => { %>
+                var examId = '<%= exam.EXAM_ID %>';
+                var examTime = new Date('<%= exam.EXAM_TIME %>');
+                var examDurationMinutes = <%= exam.EXAM_DURATION %>;
+                var endTime = new Date(examTime.getTime() + examDurationMinutes * 60000);
+                var remainingTimeElement = document.getElementById('remaining-time-' + examId);
+                var remainingTime = formatRemainingTime(currentTime, endTime);
+                if (remainingTimeElement) {
+                    remainingTimeElement.innerText = remainingTime;
+                    if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
+                        window.location.reload(); // Reload the page if remaining time is 0 seconds
+                    }
+                }
+                var remainingTimeUpcomingElement = document.getElementById('remaining-time-upcoming-' + examId);
+                if (remainingTimeUpcomingElement) {
+                    remainingTimeUpcomingElement.innerText = remainingTime;
+                    if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
+                        window.location.reload(); // Reload the page if remaining time is 0 seconds
+                    }
+                }
+            <% }); %>
+        }
+
+        // Call the updateRemainingTime function every second
+        setInterval(updateRemainingTime, 1000);
+    </script>
+
+</body>
+
+</html>

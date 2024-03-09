@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Exam Result</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        /* Add your custom styles here */
+    </style>
+</head>
+<body>
+    <!-- Navigation bar -->
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center">Past Exam Result</a>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Top div with exam details -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Exam Details</span>
+                        <!-- Exam details -->
+                        <% examdetail.forEach(function(exam){%>
+
+                        
+                        <p><strong>Scheduled By:</strong> <%= exam.FIRST_NAME  %></p>
+                        <p><strong>Teacher Email:</strong> <%= exam.EMAIL%></p>
+                        <p><strong>Exam Date:</strong><%= exam.EXAM_TIME%></p>
+                        <p><strong>Exam Duration:</strong><%= exam.EXAM_DURATION%> Minutes</p>
+                        <p><strong>Total Marks:</strong> <%= exam.TOTAL_MARKS%></p>
+                        <p><strong>Used Question Set:</strong><a href="/student/question-set/<%=exam.QUESTION_SET_ID %>"><%= exam.QUESTION_SET_NAME %></a></p>
+                        <p><strong>Number of Question:</strong> <%= exam.NO_OF_QUESTIONS%></p>
+                        <p><strong>Level Name:</strong><%= exam.LEVEL_NAME%></p>
+                        <p><strong>Obtained Marks:</strong> <%= exam.OBTAINED_MARKS %></p>
+                        <p><strong>Review:</strong> <%= exam.FEEDBACK %></p>
+                        <% }) %>
+                        <!-- Review text box -->
+                        <div class="input-field">
+                            <textarea id="review" class="materialize-textarea"></textarea>
+                            <label for="review">Write your review here</label>
+                        </div>
+                        <!-- Submit button -->
+                        <button id="submit-review" class="waves-effect waves-light btn">Submit Review</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exam answers -->
+        <div class="row">
+            <% examAnswers.forEach(function(answer) { %>
+                <div class="col s12">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Question: <%= answer.QUESTION_BODY %></span>
+                            <%if(answer.TYPE_NAME == 'MCQ'){%>
+                                <p><strong>Option 1:</strong> <%= answer.OPTION_1 %></p>
+                                <p><strong>Option 2:</strong> <%= answer.OPTION_2 %></p>
+                                <p><strong>Option 3:</strong> <%= answer.OPTION_3 %></p>
+                                <p><strong>Option 4:</strong> <%= answer.OPTION_4 %></p>
+                            <%}%>
+                            <p><strong>Given Answer:</strong> <%= answer.GIVEN_ANSWER %></p>
+                            <p><strong>Correct Answer:</strong> <%= answer.CORRECT_ANSWER %></p>
+                            <p><strong>Obtained Marks:</strong> <%= answer.OBTAINED_MARKS %></p>
+                            <p><strong>Full Marks:</strong> <%= answer.MARK_OF_QUESTION %></p>
+                            <p><strong>Is correct :</strong> <%= answer.IS_CORRECT == 1 ? 'CORRECT' : 'WRONG' %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- Client-side JavaScript -->
+    <script>
+        // JavaScript logic for handling review submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const submitButton = document.getElementById('submit-review');
+
+            submitButton.addEventListener('click', function() {
+                const review = document.getElementById('review').value;
+                //const examID = ''; // Provide the exam ID here
+
+                // Send the review to the server
+                fetch(`/student/exams/<%= examdetail[0].EXAM_ID%>/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        review: review
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Review submitted successfully');
+                        window.location.reload();
+                        // Optionally, you can redirect or perform other actions after successful submission
+                    } else {
+                        alert('Failed to submit review');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to submit review');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

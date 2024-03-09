@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-image: url('https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99'); /* Replace with your desired background image URL */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        header {
+            background-color: rgba(52, 73, 94, 0.8);
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #f39c12;
+        }
+
+        footer {
+            background-color: rgba(52, 73, 94, 0.8);
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+
+        .container h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .container p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container h1 {
+                font-size: 2.5rem;
+            }
+
+            .container p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Exam Management System</h1>
+        <nav>
+            <a href="/student/login">Student Login</a>
+            <a href="/teacher/login">Teacher Login</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Welcome to the Exam Management System</h1>
+        <p>This platform helps students and teachers manage exams efficiently.</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Exam Management System. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

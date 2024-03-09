@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Assignments</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Material Theme CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: #004985;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #79eee7;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .hide-button {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div id="header">
+        <h2>All Assignments</h2>
+    </div>
+
+    <!-- Content -->
+    <div class="container">
+
+        <h3>Due Assignments</h3>
+        <button onclick="toggleTable('due-assignment-table')" id="due-assignment-toggle" class="hide-button">Hide Table</button>
+        <table id="due-assignment-table">
+            <thead>
+                <tr>
+                    <th>Assignment ID</th>
+                    <th>Assignment Name</th>
+                    <th>Topic Name</th>
+                    <th>Level Name</th>
+                    <th>Assignment Details</th>
+                    <th>Submission Deadline</th>
+                    <th>Total Marks</th>
+                    <th>Teacher ID</th>
+                    <th>Remaining Time</th> <!-- New column for remaining time -->
+                </tr>
+            </thead>
+            <tbody>
+                <% assignments.forEach(assignment => { %>
+                    <% const submissionDeadline = new Date(assignment.SUBMISSION_DEADLINE); %>
+                    <% const currentTime = new Date(); %>
+                    <% if (currentTime <= submissionDeadline) { %>
+                        <tr onclick="redirectToAssignmentDetails('<%= assignment.ASSIGNMENT_ID %>')" style="cursor: pointer;">
+                            <td><%= assignment.ASSIGNMENT_ID %></td>
+                            <td><%= assignment.ASSIGNMENT_NAME %></td>
+                            <td><%= assignment.TOPIC_NAME %></td>
+                            <td><%= assignment.LEVEL_NAME %></td>
+                            <td><%= assignment.ASSIGNMENT_DETAILS %></td>
+                            <td><%= assignment.SUBMISSION_DEADLINE %></td>
+                            <td><%= assignment.TOTAL_MARKS %></td>
+                            <td><%= assignment.TEACHER_ID %></td>
+                            <td id="remaining-time-<%= assignment.ASSIGNMENT_ID %>"></td> <!-- Leave it empty initially -->
+                        </tr>
+                    <% } %>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h3>Past Assignments</h3>
+        <button onclick="toggleTable('past-assignment-table')" id="past-assignment-toggle" class="hide-button">Hide Table</button>
+        <table id="past-assignment-table">
+            <thead>
+                <tr>
+                    <th>Assignment ID</th>
+                    <th>Assignment Name</th>
+                    <th>Topic Name</th>
+                    <th>Level Name</th>
+                    <th>Assignment Details</th>
+                    <th>Submission Deadline</th>
+                    <th>Total Marks</th>
+                    <th>Teacher ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% assignments.forEach(assignment => { %>
+                    <% const submissionDeadline = new Date(assignment.SUBMISSION_DEADLINE); %>
+                    <% const currentTime = new Date(); %>
+                    <% if (currentTime > submissionDeadline) { %>
+                        <tr onclick="redirectToAssignmentDetails('<%= assignment.ASSIGNMENT_ID %>')" style="cursor: pointer;">
+                            <td><%= assignment.ASSIGNMENT_ID %></td>
+                            <td><%= assignment.ASSIGNMENT_NAME %></td>
+                            <td><%= assignment.TOPIC_NAME %></td>
+                            <td><%= assignment.LEVEL_NAME %></td>
+                            <td><%= assignment.ASSIGNMENT_DETAILS %></td>
+                            <td><%= assignment.SUBMISSION_DEADLINE %></td>
+                            <td><%= assignment.TOTAL_MARKS %></td>
+                            <td><%= assignment.TEACHER_ID %></td>
+                        </tr>
+                    <% } %>
+                <% }); %>
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        function redirectToAssignmentDetails(assignmentId) {
+            window.location.href = '/student/assignments/' + assignmentId; // Replace '/assignment/' with the actual route for assignment details
+        }
+
+        function toggleTable(tableId) {
+            var table = document.getElementById(tableId);
+            var toggleButton = document.getElementById(tableId + '-toggle');
+            if (table.classList.contains('hide')) {
+                table.classList.remove('hide');
+                toggleButton.textContent = 'Hide Table';
+                toggleButton.classList.remove('hide-button');
+            } else {
+                table.classList.add('hide');
+                toggleButton.textContent = 'Show Table'; // Change button text to "Show Table"
+                toggleButton.classList.add('hide-button');
+            }
+        }
+
+        function formatRemainingTime(startTime, endTime) {
+            var diff = Math.abs(endTime - startTime) / 1000; // Difference in seconds
+
+            var days = Math.floor(diff / 86400); // 1 day = 86400 seconds
+            var hours = Math.floor((diff % 86400) / 3600); // 1 hour = 3600 seconds
+            var minutes = Math.floor(((diff % 86400) % 3600) / 60); // 1 minute = 60 seconds
+            var seconds = Math.floor(((diff % 86400) % 3600) % 60);
+
+            if (days > 0) {
+                return days + " days, " + hours + " hours, " + minutes + " minutes";
+            } else {
+                return hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+            }
+        }
+
+        function updateRemainingTime() {
+            var currentTime = new Date();
+            <% assignments.forEach(assignment => { %>
+                var assignmentId = '<%= assignment.ASSIGNMENT_ID %>';
+                var submissionDeadline = new Date('<%= assignment.SUBMISSION_DEADLINE %>');
+                var remainingTimeElement = document.getElementById('remaining-time-' + assignmentId);
+                var remainingTime = formatRemainingTime(currentTime, submissionDeadline);
+                if (remainingTimeElement) {
+                    remainingTimeElement.innerText = remainingTime;
+                    if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
+                        window.location.reload(); // Reload the page if remaining time is 0 seconds
+                    }
+                }
+            <% }); %>
+        }
+
+        setInterval(updateRemainingTime, 1000);
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questions Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #fetchQuestions {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #questions-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            margin: auto;
+        }
+
+        #question-box {
+            background-color: beige;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            margin: 10px;
+        }
+
+        .question p {
+            font-weight: bold;
+        }
+
+        .options {
+            margin-top: 10px;
+        }
+
+        .option {
+            margin-right: 10px;
+        }
+
+        label {
+            margin-right: 20px;
+        }
+
+        #fetchQuestionsButton {
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="fetchQuestions">
+        <h2>Questions Searching</h2>
+
+        <!-- Button to fetch questions -->
+        <button id="fetchQuestionsButton" onclick="fetchQuestions()">Fetch Questions</button>
+
+        <p><a href="/student">Back to Student Page</a></p>
+    </div>
+
+    <!-- Container for displaying questions dynamically -->
+    <div id="questions-container">
+
+        <% questioncollections.forEach(question=> { %>
+            <div id="question-box">
+                <ul class="quiz">
+                    <!-- <li> -->
+                        <h4><%= question.QUESTION_BODY %></h4>
+                        <ul class="choices">
+                            <li>
+                                <label><input type="radio" name="question0" value="A" /><span><%= question.OPTION_1 %></span></label>
+                            </li>
+                            <li>
+                                <label><input type="radio" name="question0" value="B" /><span><%= question.OPTION_2 %></span></label>
+                            </li>
+                            <li>
+                                <label><input type="radio" name="question0" value="C" /><span><%= question.OPTION_3 %></span></label>
+                            </li>
+                            <li>
+                                <label><input type="radio" name="question0" value="D" /><span><%= question.OPTION_4 %></span></label>
+                            </li>
+                        </ul>
+                    <!-- </li> -->
+                </ul>
+                <!-- <p><%= question.QUESTION_BODY %></p>
+                    <ul class="quiz">
+                        <li><input type="radio" name="<%= question.question_type %>" value="1"> <%= question.OPTION_1 %></li>
+                        <li><label><input type="radio" name="<%= question.question_type %>" value="2"> <%= question.OPTION_2 %></label></li>
+                        <li><label><input type="radio" name="<%= question.question_type %>" value="3"> <%= question.OPTION_3 %></label></li>
+                        <li><label><input type="radio" name="<%= question.question_type %>" value="4"> <%= question.OPTION_4 %></label></li>
+                    </ul>
+                    <button id="submit">Submit answer</button> -->
+            </div>
+            <% }) %>
+    </div>
+
+
+    <script>
+        function fetchQuestions() {
+            // Make an asynchronous request to fetch questions from the server
+            window.location.href = '/get-all-questions';
+        }
+    </script>
+
+</body>
+
+</html>

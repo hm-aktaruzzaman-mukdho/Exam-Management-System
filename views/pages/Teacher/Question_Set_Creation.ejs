@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Question Set</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #navbar {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+            position: relative; /* Added */
+        }
+
+        #navbar a {
+            text-decoration: none;
+            color: #fff;
+            margin: 0 10px;
+        }
+
+        #navbar a:hover {
+            background-color: #2980b9;
+        }
+
+        #container {
+            flex-grow: 1;
+            display: flex;
+            padding: 20px;
+        }
+
+        #sidebar {
+            width: 20%;
+            padding: 20px;
+        }
+
+        #main-content {
+            width: 80%;
+            padding-left: 20px; /* Add left padding to compensate for sidebar width */
+        }
+
+        #top-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative; /* Added */
+        }
+
+        #top-section input[type="text"] {
+            width: 300px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        input[type="text"] {
+            width: 50px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Custom checkbox styles */
+        .checkbox-container {
+            position: relative;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #eee;
+            border-radius: 3px;
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #2196F3;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-container .checkmark:after {
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Highlight selected questions */
+        .selected-question {
+            background-color: #cce5ff !important; /* Added !important */
+        }
+
+        /* Question count */
+        #questionCount {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background-color: #f44336;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar">
+        <h2>Create Question Set</h2>
+        <a href="/teacher" class="waves-effect waves-light btn">Teacher Home Page</a>
+    </div>
+
+    <div id="top-section" class="container">
+        <div class="row">
+            <div class="input-field col s8">
+                <input id="questionSetName" type="text" class="validate" required>
+                <label for="questionSetName">Question Set Name</label>
+            </div>
+            <div class="input-field col s4">
+                <a class="waves-effect waves-light btn" onclick="createQuestionSet()">Create Question Set</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <a class="waves-effect waves-light btn" onclick="searchQuestionsByTopic()">Search Questions by Topic</a>
+            </div>
+        </div>
+        <div id="questionCount"></div> <!-- Question count -->
+    </div>
+
+    <div id="container" class="container">
+        <div id="sidebar">
+            <h3>Topics</h3>
+            <ul class="collection">
+                <% topics.forEach(function(topic) { %>
+                    <li class="collection-item">
+                        <label class="checkbox-container">
+                            <input type="checkbox" name="selectedTopics" value="<%= topic.TOPIC_NAME %>">
+                            <span><%= topic.TOPIC_NAME %></span>
+                            <span class="checkmark"></span>
+                        </label>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+
+        <div id="main-content">
+            <% if (questions.length > 0) { %>
+                <form id="questionSetForm">
+                    <table class="striped">
+                        <thead>
+                            <tr>
+                                <th>Question Body</th>
+                                <th>Select</th>
+                                <th>Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% questions.forEach(function(question) { %>
+                                <tr>
+                                    <td class="question-body"> <!-- Add class for highlighting -->
+                                        <strong><%= question.QUESTION_BODY %></strong><br>
+                                        Option 1: <%= question.OPTION_1 %><br>
+                                        Option 2: <%= question.OPTION_2 %><br>
+                                        Option 3: <%= question.OPTION_3 %><br>
+                                        Option 4: <%= question.OPTION_4 %>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="selectedQuestions" value="<%= question.QUESTION_ID %>">
+                                            <span></span>
+                                        </label>
+                                    </td>
+                                    <td><input type="number" name="marks" placeholder="Marks" required></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </form>
+            <% } else { %>
+                <p>No questions available.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        // Initialize Materialize components
+        M.AutoInit();
+
+        function createQuestionSet() {
+            var form = document.getElementById('questionSetForm');
+            var formData = new FormData(form);
+            var selectedQuestions = [];
+            document.querySelectorAll('input[name="selectedQuestions"]:checked').forEach(function(checkbox) {
+                var questionId = checkbox.value;
+                var markInput = checkbox.closest('tr').querySelector('input[name="marks"]');
+                var mark = markInput.value;
+                selectedQuestions.push({ questionId: questionId, mark: mark });
+            });
+            var questionSetName = document.getElementById('questionSetName').value;
+            var confirmation = confirm("Are you sure you want to create this question set?");
+            if (confirmation) {
+                var data = {
+                    questionSetName: questionSetName,
+                    selectedQuestions: selectedQuestions
+                };
+                fetch('/teacher/create-question-set', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to create question set.');
+                    }
+                })
+                .then(data => {
+                    alert("Question set created successfully!");
+                    console.log('Question set created:', data);
+                })
+                .catch(error => {
+                    console.error('Error creating question set:', error);
+                    alert("Failed to create question set. Please try again.");
+                });
+            }
+        }
+
+        function searchQuestionsByTopic() {
+            var selectedTopics = [];
+            document.querySelectorAll('input[name="selectedTopics"]:checked').forEach(function(checkbox) {
+                selectedTopics.push(checkbox.value);
+            });
+            if (selectedTopics.length === 0) {
+                alert("Please select at least one topic.");
+            } else {
+                const selectedTopicsstr=selectedTopics.join(',');
+                const url = `/teacher/search-questions-by-topic?selectedTopics=${selectedTopicsStr}`;
+                // Send selectedTopics to the server via POST request
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok.');
+                })
+                .then(data => {
+                    // Handle response from the server
+                    console.log('Response from server:', data);
+                    // Implement logic to update UI with received data
+                })
+                .catch(error => {
+                    console.error('Error:', error.message);
+                });
+            }
+        }
+        
+
+        // Function to update question count
+        function updateQuestionCount() {
+            var count = document.querySelectorAll('input[name="selectedQuestions"]:checked').length;
+            document.getElementById('questionCount').innerText = count;
+        }
+
+        // Call updateQuestionCount initially and whenever a question is selected or deselected
+        updateQuestionCount();
+        document.addEventListener('change', updateQuestionCount);
+
+        // Highlight selected questions
+        document.addEventListener('change', function(event) {
+            if (event.target.type === 'checkbox' && event.target.name === 'selectedQuestions') {
+                var parentRow = event.target.closest('tr');
+                if (event.target.checked) {
+                    parentRow.classList.add('selected-question');
+                } else {
+                    parentRow.classList.remove('selected-question');
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

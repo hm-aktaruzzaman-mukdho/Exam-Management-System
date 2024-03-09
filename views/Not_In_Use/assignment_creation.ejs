@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Assignment</title>
+  <!-- Materialize CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    main {
+      flex-grow: 1;
+    }
+
+    footer {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .form-container {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <nav class="blue">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo center">Create Assignment</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="form-container">
+      <form action="submit_assignment.php" method="POST" enctype="multipart/form-data">
+        <div class="input-field">
+          <label for="assignmentName">Assignment Name</label>
+          <input type="text" id="assignmentName" name="assignmentName" required>
+        </div>
+        <div class="input-field">
+          <select id="topicName" name="topicName" required>
+            <option value="" disabled selected>Select Topic</option>
+            <!-- Add options dynamically from the database -->
+            <option value="topic1">Topic 1</option>
+            <option value="topic2">Topic 2</option>
+          </select>
+          <label for="topicName">Topic</label>
+        </div>
+        <div class="input-field">
+          <select id="levelName" name="levelName" required>
+            <option value="" disabled selected>Select Level</option>
+            <!-- Add options dynamically from the database -->
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+          <label for="levelName">Level</label>
+        </div>
+        <div class="input-field">
+          <label for="assignmentDetails">Assignment Details</label>
+          <textarea id="assignmentDetails" name="assignmentDetails" class="materialize-textarea" required></textarea>
+        </div>
+        <div class="input-field">
+          <label for="submissionDeadline">Submission Deadline</label>
+          <input type="datetime-local" id="submissionDeadline" name="submissionDeadline" required>
+        </div>
+        <div class="input-field">
+          <label for="totalMarks">Total Marks</label>
+          <input type="number" id="totalMarks" name="totalMarks" required>
+        </div>
+        <div class="file-field input-field">
+          <div class="btn">
+            <span>Attachment (optional)</span>
+            <input type="file" id="assignmentFile" name="assignmentFile">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text">
+          </div>
+        </div>
+        <button type="submit" class="btn">Create Assignment</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <!-- Footer content here -->
+  </footer>
+
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var elems = document.querySelectorAll('select');
+      var instances = M.FormSelect.init(elems);
+    });
+  </script>
+</body>
+
+</html>

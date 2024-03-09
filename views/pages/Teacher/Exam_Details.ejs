@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ongoing Exams</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        /* Add your custom styles here */
+        .clickable-row {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Ongoing Exams</h1>
+        <table id="ongoing-table" class="striped">
+            <thead>
+                <tr>
+                    <th>Exam ID</th>
+                    <th>Student Id</th>
+                    <th>Obtained Mark</th>
+                    <th>Feedback</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% exams.forEach(exam => { %>
+                <tr class="clickable-row" data-examid="<%= exam.EXAM_ID %>" data-studentid="<%= exam.STUDENT_ID %>"
+                    onclick="redirectToExamDetails('<%= exam.EXAM_ID %>', '<%= exam.STUDENT_ID %>')">
+                    <td><%= exam.EXAM_ID %></td>
+                    <td><%= exam.STUDENT_ID %></td>
+                    <td><%= exam.OBTAINED_MARK %></td>
+                    <td><%= exam.FEEDBACK %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        function redirectToExamDetails(examId, studentId) {
+            window.location.href = '/teacher/exams/past/' + examId + '/' + studentId;
+        }
+    </script>
+</body>
+
+</html>

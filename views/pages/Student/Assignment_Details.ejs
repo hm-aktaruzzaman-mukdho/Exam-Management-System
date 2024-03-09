@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Details</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+       #remaining-time{
+        text-shadow: 5px;
+        color: brown;
+       }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="center-align">Assignment Details</h1>
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><%= assignment.ASSIGNMENT_NAME %></span>
+                        <p><strong>Due Date:</strong> <%= assignment.SUBMISSION_DEADLINE %></p>
+                        <p><strong>Created By:</strong> <%= assignment.TEACHER_ID %></p>
+                        <p><strong>Total Marks:</strong><%= assignment.TOTAL_MARKS %></p>
+                        <p><strong>Obtained Marks:</strong><%= assignment.OBTAINED_MARKS %></p>
+                        <p id="remaining-time"><strong>Remaining Time:</strong></p>
+                        <p><a href="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/submission" class="waves-effect waves-light btn">Download Submitted PDF</a></p>
+                        <!-- Add any additional details you want to display about the assignment -->
+                    </div>
+                    <div class="card-action">
+                        <!-- Link to download the assignment PDF -->
+                        <a href="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/download" class="waves-effect waves-light btn">Download Assignment PDF</a>
+                    </div>
+                </div>
+                <!-- Form to upload the assignment answer PDF -->
+                <form action="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/upload" method="POST" enctype="multipart/form-data">
+                    <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Upload Assignment Answer (PDF)</span>
+                            <input type="file" id="assignmentAnswer" name="assignmentAnswer" accept=".pdf" required>
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                    </div>
+                    <button type="submit" class="waves-effect waves-light btn">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        function formatRemainingTime(startTime, endTime) {
+            var diff = Math.abs(endTime - startTime) / 1000; // Difference in seconds
+
+            var days = Math.floor(diff / 86400); // 1 day = 86400 seconds
+            var hours = Math.floor((diff % 86400) / 3600); // 1 hour = 3600 seconds
+            var minutes = Math.floor(((diff % 86400) % 3600) / 60); // 1 minute = 60 seconds
+            var seconds = Math.floor(((diff % 86400) % 3600) % 60);
+
+            if (days > 0) {
+                return days + " days, " + hours + " hours, " + minutes + " minutes";
+            } 
+            else {
+                return hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+            }
+        }
+
+        function updateRemainingTime() {
+            var currentTime = new Date();
+            var submissionDeadline = new Date('<%= assignment.SUBMISSION_DEADLINE %>');
+            var remainingTimeElement = document.getElementById('remaining-time');
+            var remainingTime = formatRemainingTime(currentTime, submissionDeadline);
+            if (remainingTimeElement) {
+                remainingTimeElement.innerText = "Remaining Time: " + remainingTime;
+                if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
+                    window.location.reload(); // Reload the page if remaining time is 0 seconds
+                }
+            }
+        }
+
+        // Call the updateRemainingTime function every second
+        setInterval(updateRemainingTime, 1000);
+    </script>
+</body>
+</html>
