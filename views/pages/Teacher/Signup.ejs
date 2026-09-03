@@ -1,197 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Signup Page</title>
+    <title>Faculty Registration | Exam Management System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%);
+            padding: 30px 20px;
         }
 
-        #signup-heading {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px;
+        .auth-card {
             width: 100%;
+            max-width: 520px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-xl);
+            padding: 36px 32px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-header {
             text-align: center;
+            margin-bottom: 24px;
         }
 
-        #signup-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            margin-top: 20px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #back-link {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .error {
-            border: 1px solid red;
-        }
-
-        .strength-meter {
-            margin-top: 10px;
+        .auth-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: var(--secondary-gradient);
+            color: #FFF;
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
         }
 
-        .strength-bar {
-            height: 10px;
-            flex-grow: 1;
-            margin-right: 5px;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
 
-        .strength-bar.red {
-            background-color: #e74c3c;
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
         }
 
-        .strength-bar.orange {
-            background-color: #e67e22;
-        }
-
-        .strength-bar.yellow {
-            background-color: #f1c40f;
-        }
-
-        .strength-bar.green {
-            background-color: #2ecc71;
-        }
-
-        .toggle-password {
-            cursor: pointer;
-            color: #3498db;
-            margin-top: 5px;
-            display: block;
-            text-align: right;
-            font-size: 12px;
+        .auth-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
         }
     </style>
 </head>
+
 <body>
 
-    <div id="signup-heading">
-        <h1>Exam Management System</h1>
-        <h2>Teacher Signup</h2>
-    </div>
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <span class="material-icons">psychology</span>
+            </div>
+            <h1>Register Faculty Account</h1>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 4px;">Manage courses, question banks, and examinations</p>
+        </div>
 
-    <div id="signup-container">
-        <h2>Sign up</h2>
-        <form id="signupForm">
-            <label for="newPassword">Password:</label>
-            <input type="password" id="newPassword" name="newPassword" class="passwordField" required>
-            <span class="toggle-password" onclick="togglePassword('newPassword')">Show Password</span>
+        <div id="error-alert" class="alert alert-danger" style="display: none;">
+            <span class="material-icons">error_outline</span>
+            <span id="error-message"></span>
+        </div>
 
-            <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" class="passwordField" required>
-            <span class="toggle-password" onclick="togglePassword('confirmPassword')">Show Password</span>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="firstName">First Name:</label>
-            <input type="text" id="firstName" name="firstName" required>
-
-            <label for="lastName">Last Name:</label>
-            <input type="text" id="lastName" name="lastName" required>
-
-            <div class="strength-meter">
-                <div id="strength-bar-1" class="strength-bar"></div>
-                <div id="strength-bar-2" class="strength-bar"></div>
-                <div id="strength-bar-3" class="strength-bar"></div>
-                <div id="strength-bar-4" class="strength-bar"></div>
+        <form id="signupForm" action="/teacher/signup" method="POST" onsubmit="handleSignup(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <input id="firstName" name="firstName" type="text" class="form-control" placeholder="e.g. Mukdho" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <input id="lastName" name="lastName" type="text" class="form-control" placeholder="e.g. Zaman" required>
+                </div>
             </div>
 
-            <button type="button" onclick="signup()">Sign up</button>
+            <div class="form-group">
+                <label class="form-label" for="email">Faculty Email Address</label>
+                <input id="email" name="email" type="email" class="form-control" placeholder="e.g. mukdho.zaman@university.edu" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="newPassword">Password</label>
+                    <input id="newPassword" name="newPassword" type="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button id="submitBtn" type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; background: #0EA5E9;">
+                <span>Register Faculty Account</span>
+                <span class="material-icons" style="font-size: 18px;">how_to_reg</span>
+            </button>
         </form>
 
-        <div id="back-link">
-            <p>Already have an account? <a href="/teacher/login">Back to Login</a></p>
+        <div class="auth-footer">
+            Already registered? <a href="/teacher/login" style="font-weight: 600; color: #0EA5E9;">Sign in to Teacher Portal</a>
         </div>
     </div>
 
     <script>
-        function signup() {
+        async function handleSignup(e) {
+            e.preventDefault();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const email = document.getElementById('email').value;
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
 
-            // Check if passwords match
+            const errorAlert = document.getElementById('error-alert');
+            const errorMessage = document.getElementById('error-message');
+            const submitBtn = document.getElementById('submitBtn');
+
+            errorAlert.style.display = 'none';
+
             if (newPassword !== confirmPassword) {
-                alert('Passwords do not match.');
+                errorMessage.textContent = 'Passwords do not match. Please check again.';
+                errorAlert.style.display = 'flex';
                 return;
             }
 
-            // Send signup data to the server
-            fetch('/teacher/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ newPassword, email, firstName, lastName })
-            })
-            .then(response => {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Registering...';
+
+            try {
+                const response = await fetch('/teacher/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        newPassword,
+                        email,
+                        firstName,
+                        lastName
+                    })
+                });
+
                 if (response.ok) {
-                    // Redirect to the login page after successful signup
+                    alert('Faculty account registered successfully! You can now sign in.');
                     window.location.href = '/teacher/login';
                 } else {
-                    // Handle error and show a message to the user
-                    return response.json();
+                    const data = await response.json();
+                    errorMessage.textContent = data.error || 'Failed to register faculty account.';
+                    errorAlert.style.display = 'flex';
                 }
-            })
-            .then(data => {
-                if (data) {
-                    alert(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
-        function togglePassword(fieldId) {
-            const passwordField = document.getElementById(fieldId);
-            const toggleButton = document.querySelector(`[onclick="togglePassword('${fieldId}')"]`);
-
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                toggleButton.textContent = "Hide Password";
-            } else {
-                passwordField.type = "password";
-                toggleButton.textContent = "Show Password";
+            } catch (err) {
+                errorMessage.textContent = 'Network error during registration.';
+                errorAlert.style.display = 'flex';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Register Faculty Account</span><span class="material-icons" style="font-size: 18px;">how_to_reg</span>';
             }
         }
     </script>
-
 </body>
+
 </html>

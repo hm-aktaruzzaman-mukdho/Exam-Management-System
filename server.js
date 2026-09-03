@@ -1,107 +1,171 @@
 // Import required modules
 const express = require("express");
-const oracledb = require("oracledb");
 const session = require("express-session");
-const CircularJSON = require("circular-json");
-
-//This will set the oracledb sql executions to return JSON files
-oracledb.outFormat = oracledb.OBJECT;
-
-// Define Oracle database connection details
-const dbConfig = require("./dbconfig");
-
-const requireLogin = require('./middleware/requireLogin');
+const path = require("path");
+const fs = require("fs");
+const db = require("./db");
 
 // Create an Express application
 const app = express();
+
+// Ensure upload directories exist
+const uploadDirs = [
+    path.join(__dirname, "uploads"),
+    path.join(__dirname, "uploads", "Assignment_Answer"),
+    path.join(__dirname, "uploads", "Assignment_Question")
+];
+uploadDirs.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+});
+
+// Configure Session
 app.use(
-	session({
-		secret: "mykey", // Change this to a secret key
-		resave: false,
-		saveUninitialized: true,
-	})
+    session({
+        secret: process.env.SESSION_SECRET || "exam-management-secure-secret-key-2026",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000 // 1 day
+        }
+    })
 );
 
-//const connection = undefined;
-//this function will execute the sql query and return the json array of results
-// async function runquery(Query, param) {
-//   if (connection === undefined) {
-//     connection = await oracledb.getConnection(dbConfig);
-//   }
+// Set up express app to use ejs as view engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-//   try {
-//     const result = await connection.execute(Query, param);
-//     return result.rows;
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
-
-
-// Middleware to check if user is logged in
-// const requireLogin = (req, res, next) => {
-//     if (!req.session.userId || !req.session.userType) {
-//         res.redirect('/login'); // Redirect to login page if user is not logged in
-//     } else {
-//         next(); // Continue to next middleware/route handler
-//     }
-// };
-
-//Set up express app to use ejs as view engine
-app.set('view engine', 'ejs');
-
-// Set up middleware to parse sent data into json requests
+// Middleware to parse JSON and URL-encoded bodies
 app.use(express.json());
-//This is needed for html post form request.
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static assets
+app.use(express.static(path.join(__dirname, "Static")));
+app.use("/Static", express.static(path.join(__dirname, "Static")));
+app.use("/css", express.static(path.join(__dirname, "Static", "css")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-
-//Apply routes to pages
+// Apply routes
 const studentroutes = require("./routes/students_routes");
 const student_assignment = require("./routes/student_assignment");
 const student_exam = require("./routes/student_exam");
 const student_question_practice = require("./routes/student_question_practice");
-
+const student_topic_subject = require("./routes/student_topic_subject");
 
 const teacherroutes = require("./routes/teachers_routes");
 const teacher_assignment = require("./routes/teacher_assignment");
 const teacher_exam = require("./routes/teacher_exam");
 const teacher_question_manage = require("./routes/teacher_question_manage");
 const teacher_subject_topic = require("./routes/teacher_subject_topic");
+const adminRoutes = require("./routes/admin_routes");
 
-
+// Mount student routes
 app.use("/student", studentroutes);
 app.use("/student", student_assignment);
 app.use("/student", student_exam);
 app.use("/student", student_question_practice);
+app.use("/student", student_topic_subject);
 
+// Direct topic/subject endpoints (for legacy frontend calls from Dashboard)
+app.use("/", student_topic_subject);
+
+// Mount teacher routes
 app.use("/teacher", teacherroutes);
 app.use("/teacher", teacher_assignment);
 app.use("/teacher", teacher_exam);
 app.use("/teacher", teacher_question_manage);
 app.use("/teacher", teacher_subject_topic);
 
+// Mount admin routes
+app.use("/admin", adminRoutes);
 
-
+// Home and common routes
 app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/Static/homepage.html");
-	//res.render("./pages/Topic_creation.ejs",{questions:[]});
+    res.sendFile(path.join(__dirname, "Static", "homepage.html"));
+});
+
+// Logout endpoint
+app.get("/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/");
+    });
+});
+app.get("/student/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/student/login");
+    });
+});
+app.get("/teacher/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/teacher/login");
+    });
 });
 
 app.get("/admin/login", (req, res) => {
-	res.sendFile(__dirname + "/Static/Admin/Login.html");
+    res.sendFile(path.join(__dirname, "Static", "Admin", "Login.html"));
 });
 
 app.post("/admin/login", (req, res) => {
-	const { username, password } = req.body;
-	console.log(username, password);
-	res.status(200);
+    const { username, password } = req.body;
+    console.log("Admin login attempt:", username);
+    res.status(200).json({ message: "Admin login endpoint" });
 });
 
+// 404 Handler
+app.use((req, res) => {
+    if (req.accepts("html")) {
+        return res.status(404).send("<h2>404 - Page Not Found</h2><p><a href='/'>Go to Home</a></p>");
+    }
+    res.status(404).json({ error: "Endpoint not found" });
+});
+
+// Centralized error handling middleware
+app.use((err, req, res, next) => {
+    console.error("Unhandled Application Error:", err);
+    if (res.headersSent) {
+        return next(err);
+    }
+    res.status(500).json({ error: "Internal Server Error" });
+});
 
 // Start the Express server
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-	console.log(`Server is running on  http://localhost:${port}`);
-});
+let server;
+
+async function startServer() {
+    try {
+        await db.initPool();
+        server = app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
+    } catch (err) {
+        console.error("Failed to start server:", err);
+        process.exit(1);
+    }
+}
+
+// Graceful shutdown
+async function gracefulShutdown() {
+    console.log("\nShutting down gracefully...");
+    if (server) {
+        server.close(async () => {
+            console.log("HTTP server closed.");
+            await db.closePool();
+            process.exit(0);
+        });
+    } else {
+        await db.closePool();
+        process.exit(0);
+    }
+}
+
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
+
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = { app, startServer };

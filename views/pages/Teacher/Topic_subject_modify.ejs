@@ -4,204 +4,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Topic and Subject</title>
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <title>Curriculum Management | Teacher Portal</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f4f4f4;
-            /* Light grey background */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
         }
 
-        #navbar {
-            width: 100%;
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* Add a subtle shadow */
-        }
-
-        #navbar a {
-            text-decoration: none;
-            color: #fff;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 0 10px;
-        }
-
-        #navbar a:hover {
-            background-color: #2980b9;
-        }
-
-        #header {
-            text-align: center;
-            margin-top: 20px;
-            color: #fff;
-            /* White text */
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-between;
-            width: 80%;
-            margin-top: 50px;
-        }
-
-        .section {
-            width: 45%;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #fff;
-            /* White background */
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        input,
-        select {
-            width: calc(100% - 16px);
-            padding: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        button:active {
-            background-color: #1f618d;
-        }
-
-        select {
-            cursor: pointer;
+        @media (max-width: 800px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div id="navbar">
-        <div id="header">
-            <h1>Change Topic and Subject</h1>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: var(--secondary-gradient);">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <div class="brand-title">Teacher Command Center</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/teacher" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Faculty Tools</div>
+                <a href="/teacher" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item">
+                    <span class="material-icons">library_books</span>
+                    <span>View Exams</span>
+                </a>
+                <a href="/teacher/create-exam" class="sidebar-item">
+                    <span class="material-icons">playlist_add</span>
+                    <span>Create Exam</span>
+                </a>
+                <a href="/teacher/question-creation" class="sidebar-item">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>Add Question</span>
+                </a>
+                <a href="/teacher/create-question-set" class="sidebar-item">
+                    <span class="material-icons">rule</span>
+                    <span>Question Sets</span>
+                </a>
+                <a href="/teacher/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/teacher/create-assignment" class="sidebar-item">
+                    <span class="material-icons">add_to_queue</span>
+                    <span>Create Assignment</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item active">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+                <a href="/teacher/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>Faculty Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: #0EA5E9;">category</span>
+                            Curriculum & Course Management
+                        </h1>
+                        <p class="page-subtitle">Add new academic disciplines, manage course syllabus topics, or prune obsolete units</p>
+                    </div>
+                </div>
+
+                <!-- Add Section -->
+                <h2 style="font-size: 1.3rem; margin-bottom: 16px;">Add to Curriculum</h2>
+                <div class="grid-2col" style="margin-bottom: 36px;">
+                    <!-- Create Subject -->
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                            <span class="material-icons" style="color: var(--primary);">library_books</span>
+                            <h3 class="card-title" style="margin-bottom: 0;">New Subject</h3>
+                        </div>
+                        <form action="/teacher/create-subject" method="POST">
+                            <div class="form-group">
+                                <label class="form-label" for="subjectName">Subject Name</label>
+                                <input type="text" id="subjectName" name="subjectName" class="form-control" placeholder="e.g. Distributed Databases" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="subjectDescription">Subject Description</label>
+                                <textarea id="subjectDescription" name="subjectDescription" class="form-control" rows="3" placeholder="Brief overview of course curriculum..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <span class="material-icons" style="font-size: 18px;">add</span>
+                                <span>Create Subject</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Create Topic -->
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                            <span class="material-icons" style="color: #0EA5E9;">topic</span>
+                            <h3 class="card-title" style="margin-bottom: 0;">New Syllabus Topic</h3>
+                        </div>
+                        <form action="/teacher/create-topic" method="POST">
+                            <div class="form-group">
+                                <label class="form-label" for="topicName">Topic Title</label>
+                                <input type="text" id="topicName" name="topicName" class="form-control" placeholder="e.g. Concurrency Control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="subjectNameSelect">Parent Subject</label>
+                                <select id="subjectNameSelect" name="subjectName" class="form-control" required>
+                                    <% (subjects || []).forEach(s => { %>
+                                        <option value="<%= s.SUBJECT_NAME %>"><%= s.SUBJECT_NAME %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="topicDescription">Topic Description</label>
+                                <textarea id="topicDescription" name="topicDescription" class="form-control" rows="3" placeholder="Module topics and key themes..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; background: #0EA5E9;">
+                                <span class="material-icons" style="font-size: 18px;">add</span>
+                                <span>Create Topic</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Danger Zone: Deletions -->
+                <h2 style="font-size: 1.3rem; margin-bottom: 16px; color: #DC2626;">Danger Zone: Remove Curriculum Items</h2>
+                <div class="grid-2col">
+                    <!-- Delete Topic -->
+                    <div class="card" style="border-color: #FECACA;">
+                        <h3 class="card-title" style="color: #991B1B;">Remove Topic</h3>
+                        <form action="/teacher/delete-topic" method="POST" onsubmit="return confirm('Are you sure you want to delete this topic and all attached references?');">
+                            <div class="form-group">
+                                <label class="form-label" for="topicToDelete">Select Topic</label>
+                                <select id="topicToDelete" name="topicToDelete" class="form-control" required>
+                                    <% (topics || []).forEach(t => { %>
+                                        <option value="<%= t.TOPIC_NAME %>"><%= t.TOPIC_NAME %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-danger" style="width: 100%;">
+                                <span class="material-icons" style="font-size: 18px;">delete</span>
+                                <span>Delete Selected Topic</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Delete Subject -->
+                    <div class="card" style="border-color: #FECACA;">
+                        <h3 class="card-title" style="color: #991B1B;">Remove Subject</h3>
+                        <form action="/teacher/delete-subject" method="POST" onsubmit="return confirm('Deleting a subject will cascade or require all linked topics to be cleared first. Proceed?');">
+                            <div class="form-group">
+                                <label class="form-label" for="subjectToDelete">Select Subject</label>
+                                <select id="subjectToDelete" name="subjectToDelete" class="form-control" required>
+                                    <% (subjects || []).forEach(s => { %>
+                                        <option value="<%= s.SUBJECT_NAME %>"><%= s.SUBJECT_NAME %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-danger" style="width: 100%;">
+                                <span class="material-icons" style="font-size: 18px;">delete_forever</span>
+                                <span>Delete Selected Subject</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </main>
         </div>
-        <a href="/teacher" class="waves-effect waves-light btn">Teacher Home Page</a>
-        <!-- <a href="/previous-page" class="waves-effect waves-light btn">Previous Page</a> -->
     </div>
-
-    <div class="container">
-        <div class="section"> <!-- Lighter grey background -->
-            <h2>Create Topic</h2>
-            <form action="/teacher/create-topic" method="POST">
-                <label for="topicName">Topic Name:</label>
-                <input type="text" id="topicName" name="topicName" required><br><br>
-            
-                <label for="subjectName">Subject Name:</label>
-                <select id="subjectName" name="subjectName" required>
-                    <!-- Here you can use EJS to insert the values from the server -->
-                    <% subjects.forEach(subject => { %>
-                        <option value="<%= subject.SUBJECT_NAME %>">
-                            <%= subject.SUBJECT_NAME %>
-                        </option>
-                    <% }) %>
-                </select><br><br>
-            
-                <label for="topicDescription">Topic Description:</label><br>
-                <textarea id="topicDescription" name="topicDescription" rows="10" cols="30" required></textarea><br><br>
-            
-                <button type="submit" class="waves-effect waves-light btn">Submit Topic</button>
-            </form>
-            
-        </div>
-
-        <div class="section"> <!-- Light grey background -->
-            <h2>Create Subject</h2>
-            <form action="/teacher/create-subject" method="POST">
-                <label for="subjectName">Subject Name:</label>
-                <input type="text" id="subjectName" name="subjectName" required><br><br>
-
-                <label for="subjectDescription">Subject Description:</label><br>
-                <textarea id="subjectDescription" name="subjectDescription" rows="4" cols="30"
-                    required></textarea><br><br>
-
-                <button type="submit" class="waves-effect waves-light btn">Submit Subject</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="section"> <!-- Lighter grey background -->
-            <h2>Delete Topic</h2>
-            <form action="/teacher/delete-topic" method="POST"
-                onsubmit="return confirm('Are you sure you want to delete this topic?');">
-                <label for="topicToDelete">Select Topic to Delete:</label>
-                <select id="topicToDelete" name="topicToDelete" required>
-                    <!-- Options will be dynamically added here using EJS -->
-                    <% topics.forEach( topic=>{%>
-                        <option value="<%=topic.TOPIC_NAME%>">
-                            <%=topic.TOPIC_NAME%>
-                        </option>
-
-                        <%}) %>
-                </select><br><br>
-                <button type="submit" class="waves-effect waves-light btn">Delete Topic</button>
-            </form>
-        </div>
-
-        <div class="section"> <!-- Light grey background -->
-            <h2>Delete Subject</h2>
-            <form action="/teacher/delete-subject" method="POST"
-                onsubmit="return confirm('Are you sure you want to delete this subject?');">
-                <label for="subjectToDelete">Select Subject to Delete:</label>
-                <select id="subjectToDelete" name="subjectToDelete" required>
-                    <!-- Options will be dynamically added here using EJS -->
-                    <% subjects.forEach(subject=>{%>
-                        <option value="<%=subject.SUBJECT_NAME%>">
-                            <%=subject.SUBJECT_NAME%>
-                        </option>
-                        <% }) %>
-                            <!-- <option value="subject1">Subject 1</option>
-                    <option value="subject2">Subject 2</option>
-                    <option value="subject3">Subject 3</option> -->
-                            <!-- Add more options as needed -->
-                </select><br><br>
-                <button type="submit" class="waves-effect waves-light btn">Delete Subject</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var elems = document.querySelectorAll('select');
-            var instances = M.FormSelect.init(elems);
-        });
-    </script>
 
 </body>
 

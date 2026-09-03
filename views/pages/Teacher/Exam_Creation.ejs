@@ -4,99 +4,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Exam</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-
-        main {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        input[type="number"],
-        textarea,
-        select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 5px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-    </style>
+    <title>Schedule Examination | Teacher Portal</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
 </head>
 
 <body>
-    <header>
-        <h1>Create Exam</h1>
-    </header>
-    <main>
-        <form action="/teacher/create-exam" method="POST">
-            <div class="form-group">
-                <label for="examName">Exam Name:</label>
-                <input type="text" id="examName" name="examName" required>
-            </div>
-            <div class="form-group">
-                <label for="examDate">Exam Date:</label>
-                <input type="datetime-local" id="examDate" name="examDate" required>
-            </div>
-            <div class="form-group">
-                <label for="examDuration">Exam Duration (in minutes):</label>
-                <input type="number" id="examDuration" name="examDuration" required>
-            </div>
-            <div class="form-group">
-                <label for="academicLevel">Academic Level:</label>
-                <select id="academicLevel" name="academicLevel" required>
-                    <% academicLevels.forEach(function(level) { %>
-                    <option value="<%= level.LEVEL_NAME %>"><%= level.LEVEL_NAME %></option>
-                    <% }); %>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="questionSet">Question Set:</label>
-                <select id="questionSet" name="questionSet" required>
-                    <% questionSets.forEach(function(question) { %>
-                    <option value="<%= question.QUESTION_SET_ID %>"><%= question.QUESTION_SET_ID %> -
-                        <%= question.QUESTION_SET_NAME %></option>
-                    <% }); %>
-                </select>
-            </div>
-            <button type="submit">Create Exam</button>
-        </form>
-    </main>
 
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: var(--secondary-gradient);">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <div class="brand-title">Teacher Command Center</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/teacher" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Faculty Tools</div>
+                <a href="/teacher" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item">
+                    <span class="material-icons">library_books</span>
+                    <span>View Exams</span>
+                </a>
+                <a href="/teacher/create-exam" class="sidebar-item active">
+                    <span class="material-icons">playlist_add</span>
+                    <span>Create Exam</span>
+                </a>
+                <a href="/teacher/question-creation" class="sidebar-item">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>Add Question</span>
+                </a>
+                <a href="/teacher/create-question-set" class="sidebar-item">
+                    <span class="material-icons">rule</span>
+                    <span>Question Sets</span>
+                </a>
+                <a href="/teacher/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/teacher/create-assignment" class="sidebar-item">
+                    <span class="material-icons">add_to_queue</span>
+                    <span>Create Assignment</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+                <a href="/teacher/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>Faculty Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: #0EA5E9;">playlist_add</span>
+                            Schedule New Examination
+                        </h1>
+                        <p class="page-subtitle">Configure examination parameters, set time windows, and attach question papers</p>
+                    </div>
+                </div>
+
+                <div class="card" style="max-width: 680px;">
+                    <form action="/teacher/create-exam" method="POST">
+                        <div class="form-group">
+                            <label class="form-label" for="examName">Exam Title</label>
+                            <input type="text" id="examName" name="examName" class="form-control" placeholder="e.g. Midterm Assessment 2026" required>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="examDate">Launch Date & Time</label>
+                                <input type="datetime-local" id="examDate" name="examDate" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="examDuration">Duration (Minutes)</label>
+                                <input type="number" id="examDuration" name="examDuration" class="form-control" min="5" max="300" value="60" required>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="academicLevel">Target Academic Level</label>
+                                <select id="academicLevel" name="academicLevel" class="form-control" required>
+                                    <% (academicLevels || []).forEach(function(level) { %>
+                                        <option value="<%= level.LEVEL_NAME %>"><%= level.LEVEL_NAME %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="questionSet">Attached Question Set</label>
+                                <select id="questionSet" name="questionSet" class="form-control" required>
+                                    <% (questionSets || []).forEach(function(set) { %>
+                                        <option value="<%= set.QUESTION_SET_ID %>">
+                                            #<%= set.QUESTION_SET_ID %> &bull; <%= set.QUESTION_SET_NAME %>
+                                        </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px; width: 100%; background: #0EA5E9;">
+                            <span class="material-icons" style="font-size: 18px;">event_available</span>
+                            <span>Publish & Schedule Exam</span>
+                        </button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 5);
+        const isoStr = now.toISOString().slice(0, 16);
+        const dateInput = document.getElementById('examDate');
+        if (dateInput) {
+            dateInput.value = isoStr;
+        }
+    </script>
 </body>
 
 </html>

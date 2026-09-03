@@ -4,51 +4,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ongoing Exams</title>
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <style>
-        /* Add your custom styles here */
-        .clickable-row {
-            cursor: pointer;
-        }
-    </style>
+    <title>Exam Student Submissions | Teacher Portal</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
 </head>
 
 <body>
-    <div class="container">
-        <h1>Ongoing Exams</h1>
-        <table id="ongoing-table" class="striped">
-            <thead>
-                <tr>
-                    <th>Exam ID</th>
-                    <th>Student Id</th>
-                    <th>Obtained Mark</th>
-                    <th>Feedback</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% exams.forEach(exam => { %>
-                <tr class="clickable-row" data-examid="<%= exam.EXAM_ID %>" data-studentid="<%= exam.STUDENT_ID %>"
-                    onclick="redirectToExamDetails('<%= exam.EXAM_ID %>', '<%= exam.STUDENT_ID %>')">
-                    <td><%= exam.EXAM_ID %></td>
-                    <td><%= exam.STUDENT_ID %></td>
-                    <td><%= exam.OBTAINED_MARK %></td>
-                    <td><%= exam.FEEDBACK %></td>
-                </tr>
-                <% }); %>
-            </tbody>
-        </table>
+
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: var(--secondary-gradient);">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <div class="brand-title">Teacher Command Center</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/teacher/exams" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">arrow_back</span>
+                    <span>All Exams</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Faculty Tools</div>
+                <a href="/teacher" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item active">
+                    <span class="material-icons">library_books</span>
+                    <span>View Exams</span>
+                </a>
+                <a href="/teacher/create-exam" class="sidebar-item">
+                    <span class="material-icons">playlist_add</span>
+                    <span>Create Exam</span>
+                </a>
+                <a href="/teacher/question-creation" class="sidebar-item">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>Add Question</span>
+                </a>
+                <a href="/teacher/create-question-set" class="sidebar-item">
+                    <span class="material-icons">rule</span>
+                    <span>Question Sets</span>
+                </a>
+                <a href="/teacher/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+            </nav>
+
+            <main class="app-main">
+                <div style="margin-bottom: 20px;">
+                    <a href="/teacher/exams" class="btn btn-outline btn-sm">
+                        <span class="material-icons" style="font-size: 16px;">arrow_back</span>
+                        <span>Back to All Exams</span>
+                    </a>
+                </div>
+
+                <div class="page-header">
+                    <div>
+                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                            <span class="badge" style="background: #EEF2FF; color: var(--primary);">
+                                Exam #<%= (typeof examMeta !== 'undefined' && examMeta && examMeta.EXAM_ID) || (exams && exams[0] && exams[0].EXAM_ID) || '' %>
+                            </span>
+                            <span class="badge" style="background: #F1F5F9; color: #475569;">
+                                <%= (typeof examMeta !== 'undefined' && examMeta && examMeta.QUESTION_SET_NAME) || 'Standard Assessment' %>
+                            </span>
+                            <span class="badge" style="background: #ECFDF5; color: #059669;">
+                                <%= (typeof examMeta !== 'undefined' && examMeta && examMeta.EXAM_TYPE) || 'Scheduled' %>
+                            </span>
+                        </div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: #0EA5E9;">analytics</span>
+                            Exam Performance & Submissions
+                        </h1>
+                        <p class="page-subtitle">Inspect individual student responses, verify auto-evaluations, and review aggregate class analytics</p>
+                    </div>
+                </div>
+
+                <!-- Analytics Overview Cards -->
+                <% if (typeof analytics !== 'undefined') { %>
+                    <div class="grid-stats" style="margin-bottom: 28px;">
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-primary">
+                                <span class="material-icons">people</span>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value"><%= analytics.totalCandidates %></div>
+                                <div class="stat-label">Total Submissions</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-success">
+                                <span class="material-icons">grade</span>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value"><%= analytics.avgScore %> <span style="font-size: 0.95rem; color: var(--text-light);">/ <%= analytics.totalMarks %></span></div>
+                                <div class="stat-label">Class Average Score</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-secondary">
+                                <span class="material-icons">emoji_events</span>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value"><%= analytics.highScore %> <span style="font-size: 0.95rem; color: var(--text-light);">/ <%= analytics.totalMarks %></span></div>
+                                <div class="stat-label">Top Highest Score</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-warning">
+                                <span class="material-icons">trending_up</span>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value"><%= analytics.passRate %>%</div>
+                                <div class="stat-label">Pass Rate (&ge; 50% Marks)</div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Student ID</th>
+                                    <th>Score Awarded</th>
+                                    <th>Status</th>
+                                    <th>Faculty Feedback</th>
+                                    <th style="text-align: right;">Evaluation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (exams && exams.length > 0) { %>
+                                    <% const maxScore = (typeof analytics !== 'undefined' && analytics.totalMarks) ? analytics.totalMarks : 100; %>
+                                    <% exams.forEach(exam => { %>
+                                        <% 
+                                            const score = exam.OBTAINED_MARKS != null ? Number(exam.OBTAINED_MARKS) : 0;
+                                            const isPassed = score >= (maxScore * 0.5);
+                                        %>
+                                        <tr>
+                                            <td>
+                                                <div style="font-weight: 600;"><%= (exam.FIRST_NAME || '') + ' ' + (exam.LAST_NAME || '') %></div>
+                                                <div style="font-size: 0.78rem; color: var(--text-muted);"><%= exam.EMAIL || 'No email' %></div>
+                                            </td>
+                                            <td><span class="badge" style="background: #F8FAFC; color: #475569;">#<%= exam.STUDENT_ID %></span></td>
+                                            <td>
+                                                <span class="badge" style="background: #E0E7FF; color: #4338CA; font-size: 0.92rem; font-weight: 700;">
+                                                    <%= score %> / <%= maxScore %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge <%= isPassed ? 'badge-active' : 'badge-past' %>">
+                                                    <%= isPassed ? 'Passed' : 'Needs Review' %>
+                                                </span>
+                                            </td>
+                                            <td style="color: var(--text-muted); font-size: 0.88rem;">
+                                                <%= exam.FEEDBACK || 'Auto-evaluated on submission' %>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <a href="/teacher/exams/past/<%= exam.EXAM_ID %>/<%= exam.STUDENT_ID %>" class="btn btn-primary btn-sm" style="background: #0EA5E9;">
+                                                    <span>Review Answers</span>
+                                                    <span class="material-icons" style="font-size: 16px;">edit_note</span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                            <span class="material-icons" style="font-size: 36px; display: block; margin-bottom: 8px; color: #CBD5E1;">pending_actions</span>
+                                            No student submissions have been recorded for this examination yet.
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <!-- Materialize JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
-    <script>
-        function redirectToExamDetails(examId, studentId) {
-            window.location.href = '/teacher/exams/past/' + examId + '/' + studentId;
-        }
-    </script>
 </body>
 
 </html>

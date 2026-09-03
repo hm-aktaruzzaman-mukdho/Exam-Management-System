@@ -1,134 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Page</title>
+    <title>Teacher Command Center | Exam Management System</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
-    
-        #header {
-            background-color: #004985;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        #main-container {
-            display: flex;
-            align-items: stretch;
-            height: calc(100% - 60px);
-            width: 100%;
-        }
-    
-        #options-container {
+        .action-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            cursor: pointer;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            padding: 20px;
-            background-color: #fff;
-            border-right: 1px solid #e0e0e0;
-            width: 15%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            max-height: calc(100vh - 60px);
+            justify-content: space-between;
         }
-    
-        .option {
-            padding: 12px;
-            margin: 10px 0;
-            cursor: pointer;
-            border-radius: 4px;
-            width: 100%;
-            text-align: center;
-            background-color: #fff;
-            color: #333;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: #CBD5E1;
+        }
+
+        .action-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .action-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #FFF;
+            font-size: 24px;
         }
-        
-        .option:hover {
-            background-color: #9aaeb4;
+
+        .action-title {
+            font-size: 1.15rem;
+            font-weight: 700;
         }
-    
-        #content-container {
-            padding: 20px;
-            flex-grow: 1;
+
+        .action-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 16px;
         }
     </style>
 </head>
+
 <body>
 
-    <div id="header">
-        <h1>Teacher Dashboard</h1>
-        <p>Welcome to the Teacher Page!</p>
-        <p><a href="/" style="align-items:right; color: #fff; text-decoration: none;">Go to Home page</a></p>
-    </div>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: var(--secondary-gradient);">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <div>
+                    <div class="brand-title">Teacher Command Center</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <div class="user-badge">
+                    <div class="user-avatar" style="background: #E0F2FE; color: #0284C7;">T</div>
+                    <span style="font-weight: 600; font-size: 0.9rem;">Faculty Portal</span>
+                    <span class="user-role-pill" style="background: #E0F2FE; color: #0284C7;">Teacher</span>
+                </div>
+                <% if (typeof user !== 'undefined' && user && user[0] && user[0].IS_ADMIN === 1) { %>
+                <a href="/admin" class="btn btn-outline btn-sm" style="border-color: #DC2626; color: #DC2626;">
+                    <span class="material-icons" style="font-size: 16px;">admin_panel_settings</span>
+                    <span>Admin Console</span>
+                </a>
+                <% } %>
+                <a href="/teacher/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
 
-    <div id="main-container">
+        <div class="app-body">
+            <!-- Sidebar Navigation -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Faculty Tools</div>
+                <a href="/teacher" class="sidebar-item active">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item">
+                    <span class="material-icons">library_books</span>
+                    <span>View Exams</span>
+                </a>
+                <a href="/teacher/create-exam" class="sidebar-item">
+                    <span class="material-icons">playlist_add</span>
+                    <span>Create Exam</span>
+                </a>
+                <a href="/teacher/question-creation" class="sidebar-item">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>Add Question</span>
+                </a>
+                <a href="/teacher/create-question-set" class="sidebar-item">
+                    <span class="material-icons">rule</span>
+                    <span>Question Sets</span>
+                </a>
+                <a href="/teacher/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/teacher/create-assignment" class="sidebar-item">
+                    <span class="material-icons">add_to_queue</span>
+                    <span>Create Assignment</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+                <a href="/teacher/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>Faculty Profile</span>
+                </a>
+            </nav>
 
-        <div id="options-container">
-            <div class="option" onclick="redirectTo('/teacher/modify-topic-subject')">
-                <span class="material-icons">format_list_bulleted</span>
-                <span>Subjects and Topics</span>
-            </div>
-            <div class="option" onclick="redirectTo('/teacher/question-creation')">
-                <span class="material-icons">add_circle_outline</span>
-                <span>Add Questions</span>
-            </div>
-            <div class="option" onclick="redirectTo('/teacher/create-question-set')">
-                <span class="material-icons">create</span>
-                <span>Create Question Set</span>
-            </div>
-            <div class="option" onclick="redirectTo('/teacher/exams')">
-                <span class="material-icons">library_books</span>
-                <span>View Exams</span>
-            </div>
-            <div class="option" onclick="redirectTo('/teacher/create-exam')">
-                <span class="material-icons">playlist_add</span>
-                <span>Create Exams</span>
-            </div>
-            <div class="option" onclick="redirectTo('/teacher/assignments')">
-                <span class="material-icons">assignment</span>
-                <span>Assignments</span>
-            </div>
-            <div class="option" onclick="redirectTo('/teacher/create-assignment')">
-                <span class="material-icons">add_to_queue</span>
-                <span>Create Assignment</span>
-            </div>
-            <div class="option" onclick="redirectTo('/teacher/profile')">
-                <span class="material-icons">person</span>
-                <span>Profile</span>
-            </div>
-            <!-- Add more options as needed -->
+            <!-- Main Content Workspace -->
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: #0EA5E9;">tune</span>
+                            Faculty Overview & Management
+                        </h1>
+                        <p class="page-subtitle">Schedule examinations, build comprehensive question sets, and grade submissions</p>
+                    </div>
+                    <div>
+                        <a href="/teacher/create-exam" class="btn btn-primary" style="background: var(--secondary-gradient);">
+                            <span class="material-icons" style="font-size: 18px;">add</span>
+                            <span>Schedule Exam</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid-stats">
+                    <div class="stat-card" onclick="window.location.href='/teacher/exams'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-secondary">
+                            <span class="material-icons">library_books</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.totalExams) || 0 %></div>
+                            <div class="stat-label">Exams Created & Managed</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/teacher/create-question-set'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-primary">
+                            <span class="material-icons">quiz</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.totalQuestions) || 0 %></div>
+                            <div class="stat-label">Active Questions (<%= (typeof stats !== 'undefined' && stats.totalQuestionSets) || 0 %> Sets)</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/teacher/assignments'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-warning">
+                            <span class="material-icons">assignment</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.pendingGrades) || 0 %></div>
+                            <div class="stat-label">Submissions Awaiting Grading</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/teacher/modify-topic-subject'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-success">
+                            <span class="material-icons">school</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.totalStudents) || 0 %></div>
+                            <div class="stat-label">Registered Student Scholars</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Hub -->
+                <div class="card">
+                    <h2 class="card-title">Quick Action Hub</h2>
+                    <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 20px;">Direct access to core academic operations</p>
+
+                    <div class="action-grid">
+                        <div class="action-card" onclick="window.location.href='/teacher/create-exam'">
+                            <div>
+                                <div class="action-header">
+                                    <div class="action-icon" style="background: var(--secondary-gradient);">
+                                        <span class="material-icons">playlist_add</span>
+                                    </div>
+                                    <div class="action-title">Create Exam</div>
+                                </div>
+                                <p class="action-desc">Configure exam duration, select academic level, attach a question set, and schedule launch time.</p>
+                            </div>
+                            <span class="btn btn-outline btn-sm" style="align-self: flex-start;">Launch Exam Builder &rarr;</span>
+                        </div>
+
+                        <div class="action-card" onclick="window.location.href='/teacher/question-creation'">
+                            <div>
+                                <div class="action-header">
+                                    <div class="action-icon" style="background: var(--primary-gradient);">
+                                        <span class="material-icons">add_circle_outline</span>
+                                    </div>
+                                    <div class="action-title">Add New Question</div>
+                                </div>
+                                <p class="action-desc">Enrich the central question repository with multiple choice, true/false, or written questions.</p>
+                            </div>
+                            <span class="btn btn-outline btn-sm" style="align-self: flex-start;">Add Questions &rarr;</span>
+                        </div>
+
+                        <div class="action-card" onclick="window.location.href='/teacher/create-question-set'">
+                            <div>
+                                <div class="action-header">
+                                    <div class="action-icon" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">
+                                        <span class="material-icons">rule</span>
+                                    </div>
+                                    <div class="action-title">Create Question Set</div>
+                                </div>
+                                <p class="action-desc">Filter questions by topic, assign individual marks, and package into an exam-ready set.</p>
+                            </div>
+                            <span class="btn btn-outline btn-sm" style="align-self: flex-start;">Assemble Sets &rarr;</span>
+                        </div>
+
+                        <div class="action-card" onclick="window.location.href='/teacher/create-assignment'">
+                            <div>
+                                <div class="action-header">
+                                    <div class="action-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                                        <span class="material-icons">add_to_queue</span>
+                                    </div>
+                                    <div class="action-title">New Assignment</div>
+                                </div>
+                                <p class="action-desc">Publish homework tasks, attach prompt documents, set deadlines, and specify total marks.</p>
+                            </div>
+                            <span class="btn btn-outline btn-sm" style="align-self: flex-start;">New Assignment &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
-
-        <div id="content-container">
-            <!-- Content will be dynamically loaded here -->
-        </div>
-
     </div>
-
-    <script>
-        function redirectTo(page) {
-            // Redirect to the specified page
-            window.location.href = page;
-        }
-    </script>
 
 </body>
+
 </html>

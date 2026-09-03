@@ -4,96 +4,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <title>Student Sign In | Exam Management System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-xl);
+            padding: 36px 32px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .auth-logo {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: var(--primary-gradient);
+            color: #FFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .auth-title {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+        }
+
+        .auth-subtitle {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--text-main);
+        }
+
+        .auth-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .role-switch {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
 
 <body>
 
-    <nav>
-        <div class="nav-wrapper blue darken-2">
-            <a href="/" class="brand-logo center">Exam Management System</a>
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <span class="material-icons">school</span>
+            </div>
+            <h1 class="auth-title">Student Portal</h1>
+            <p class="auth-subtitle">Sign in to access your assessments and exams</p>
         </div>
-    </nav>
 
-    <div class="container">
-        <div class="row">
-            <div class="col s12 m6 offset-m3">
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title">Student login</span>
-                        <div class="input-field">
-                            <input id="email" type="text" class="validate" required>
-                            <label for="email">EMAIL ID</label>
-                        </div>
-                        <div class="input-field">
-                            <input id="password" type="password" class="validate" required>
-                            <label for="password">Password</label>
-                            <span class="toggle-password" onclick="togglePassword('password')">Show Password</span>
-                        </div>
-                    </div>
-                    <div class="card-action">
-                        <button class="btn waves-effect waves-light" type="button" onclick="login()">Login</button>
-                    </div>
-                    <div id="signup-link" class="card-action">
-                        <p>Don't have an account? <a href="/student/signup">Sign up</a></p>
-                    </div>
+        <div id="error-alert" class="alert alert-danger" style="display: none;">
+            <span class="material-icons">error_outline</span>
+            <span id="error-message"></span>
+        </div>
+
+        <form id="loginForm" action="/student/login" method="POST" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input id="email" name="email" type="email" class="form-control" placeholder="e.g. mobasharul.islam@gmail.com" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="password-wrapper">
+                    <input id="password" name="password" type="password" class="form-control" placeholder="••••••••" required>
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                        <span id="toggleIcon" class="material-icons" style="font-size: 20px;">visibility_off</span>
+                    </button>
                 </div>
             </div>
+
+            <button id="submitBtn" type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                <span>Sign In to Student Account</span>
+                <span class="material-icons" style="font-size: 18px;">arrow_forward</span>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="/student/signup" style="font-weight: 600;">Sign up now</a>
+        </div>
+
+        <div class="role-switch">
+            <span>Are you a faculty member?</span>
+            <a href="/teacher/login" style="font-weight: 600;">Teacher Portal &rarr;</a>
         </div>
     </div>
 
-    <!-- Materialize JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
     <script>
-        function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Send login data to the server
-            fetch('/student/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Redirect to the success page after successful login
-                    window.location.href = '/student';
-                } else {
-                    // Handle error and show a message to the user
-                    return response.json();
-                }
-            })
-            .then(data => {
-                if (data) {
-                    alert(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        function togglePasswordVisibility() {
+            const pwd = document.getElementById('password');
+            const icon = document.getElementById('toggleIcon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                pwd.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
         }
 
-        // Function to toggle password visibility
-        function togglePassword(fieldId) {
-            const passwordField = document.getElementById(fieldId);
-            const toggleButton = document.querySelector(`[onclick="togglePassword('${fieldId}')"]`);
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const errorAlert = document.getElementById('error-alert');
+            const errorMessage = document.getElementById('error-message');
 
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                toggleButton.textContent = "Hide Password";
-            } else {
-                passwordField.type = "password";
-                toggleButton.textContent = "Show Password";
+            errorAlert.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Signing in...';
+
+            try {
+                const response = await fetch('/student/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/student';
+                } else {
+                    const data = await response.json();
+                    errorMessage.textContent = data.error || 'Invalid email or password.';
+                    errorAlert.style.display = 'flex';
+                }
+            } catch (err) {
+                errorMessage.textContent = 'Network error connecting to server.';
+                errorAlert.style.display = 'flex';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Sign In to Student Account</span><span class="material-icons" style="font-size: 18px;">arrow_forward</span>';
             }
         }
     </script>
-
 </body>
 
 </html>

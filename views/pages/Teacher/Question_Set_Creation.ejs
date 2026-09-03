@@ -4,354 +4,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Question Set</title>
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <title>Question Set Builder | Teacher Portal</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
+        .builder-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
         }
 
-        #navbar {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            box-sizing: border-box;
-            position: relative; /* Added */
+        @media (max-width: 900px) {
+            .builder-layout {
+                grid-template-columns: 1fr;
+            }
         }
 
-        #navbar a {
-            text-decoration: none;
-            color: #fff;
-            margin: 0 10px;
-        }
-
-        #navbar a:hover {
-            background-color: #2980b9;
-        }
-
-        #container {
-            flex-grow: 1;
-            display: flex;
+        .topic-filter-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
             padding: 20px;
+            box-shadow: var(--shadow-sm);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
         }
 
-        #sidebar {
-            width: 20%;
-            padding: 20px;
-        }
-
-        #main-content {
-            width: 80%;
-            padding-left: 20px; /* Add left padding to compensate for sidebar width */
-        }
-
-        #top-section {
+        .topic-checkbox-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            position: relative; /* Added */
-        }
-
-        #top-section input[type="text"] {
-            width: 300px;
-        }
-
-        table {
-            width: 100%;
-        }
-
-        th,
-        td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #3498db;
-            color: #fff;
-        }
-
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        input[type="text"] {
-            width: 50px;
-        }
-
-        button {
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
+            transition: background-color var(--transition-fast);
+            font-size: 0.9rem;
+            user-select: none;
         }
 
-        button:hover {
-            background-color: #2980b9;
+        .topic-checkbox-item:hover {
+            background-color: #F8FAFC;
         }
 
-        /* Custom checkbox styles */
-        .checkbox-container {
-            position: relative;
-            display: inline-block;
-            margin-right: 10px;
-        }
-
-        .checkbox-container input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 20px;
-            width: 20px;
-            background-color: #eee;
-            border-radius: 3px;
-        }
-
-        .checkbox-container:hover input ~ .checkmark {
-            background-color: #ccc;
-        }
-
-        .checkbox-container input:checked ~ .checkmark {
-            background-color: #2196F3;
-        }
-
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
-
-        .checkbox-container input:checked ~ .checkmark:after {
-            display: block;
-        }
-
-        .checkbox-container .checkmark:after {
-            left: 7px;
-            top: 3px;
-            width: 5px;
-            height: 10px;
-            border: solid white;
-            border-width: 0 3px 3px 0;
-            transform: rotate(45deg);
-        }
-
-        /* Highlight selected questions */
-        .selected-question {
-            background-color: #cce5ff !important; /* Added !important */
-        }
-
-        /* Question count */
-        #questionCount {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            background-color: #f44336;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 50%;
+        .topic-checkbox-item input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="navbar">
-        <h2>Create Question Set</h2>
-        <a href="/teacher" class="waves-effect waves-light btn">Teacher Home Page</a>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: var(--secondary-gradient);">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <div class="brand-title">Teacher Command Center</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/teacher" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Faculty Tools</div>
+                <a href="/teacher" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item">
+                    <span class="material-icons">library_books</span>
+                    <span>View Exams</span>
+                </a>
+                <a href="/teacher/create-exam" class="sidebar-item">
+                    <span class="material-icons">playlist_add</span>
+                    <span>Create Exam</span>
+                </a>
+                <a href="/teacher/question-creation" class="sidebar-item">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>Add Question</span>
+                </a>
+                <a href="/teacher/create-question-set" class="sidebar-item active">
+                    <span class="material-icons">rule</span>
+                    <span>Question Sets</span>
+                </a>
+                <a href="/teacher/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+                <a href="/teacher/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>Faculty Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: #0EA5E9;">rule</span>
+                            Assemble Question Set
+                        </h1>
+                        <p class="page-subtitle">Filter by subject topic, pick questions, allocate marks, and save exam sets</p>
+                    </div>
+                </div>
+
+                <!-- Set Naming & Save Header -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                        <div style="flex: 1; min-width: 260px;">
+                            <label class="form-label" for="questionSetName">Question Set Name</label>
+                            <input id="questionSetName" type="text" class="form-control" placeholder="e.g. Midterm 2026 Question Paper A" required>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Selected Items</div>
+                                <div id="selectedCount" style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 800; color: #0EA5E9;">0 Questions</div>
+                            </div>
+
+                            <button id="saveSetBtn" type="button" class="btn btn-primary" style="background: #0EA5E9;" onclick="saveQuestionSet()">
+                                <span class="material-icons" style="font-size: 18px;">library_add_check</span>
+                                <span>Save Question Set</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Builder Workspace -->
+                <div class="builder-layout">
+                    <!-- Left: Topic Selection Filter -->
+                    <div class="topic-filter-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <strong style="font-size: 0.95rem;">Filter Topics</strong>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="selectAllTopics(true)" style="padding: 2px 8px; font-size: 0.75rem;">All</button>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px;">
+                            <% (topics || []).forEach(topic => { %>
+                                <label class="topic-checkbox-item">
+                                    <input type="checkbox" name="selectedTopics" value="<%= topic.TOPIC_NAME %>">
+                                    <span><%= topic.TOPIC_NAME %></span>
+                                </label>
+                            <% }); %>
+                        </div>
+
+                        <button type="button" class="btn btn-secondary btn-sm" style="width: 100%;" onclick="filterQuestionsByTopic()">
+                            <span class="material-icons" style="font-size: 16px;">search</span>
+                            <span>Apply Topic Filter</span>
+                        </button>
+                    </div>
+
+                    <!-- Right: Questions Table -->
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="data-table" id="questionsTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 48px; text-align: center;">Select</th>
+                                        <th>Question Text & Options</th>
+                                        <th style="width: 120px;">Marks Allocated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (questions && questions.length > 0) { %>
+                                        <% questions.forEach(q => { %>
+                                            <tr data-question-id="<%= q.QUESTION_ID %>">
+                                                <td style="text-align: center;">
+                                                    <input type="checkbox" name="selectedQuestions" value="<%= q.QUESTION_ID %>" onchange="updateSelectedCounter()" style="accent-color: var(--primary); width: 18px; height: 18px; cursor: pointer;">
+                                                </td>
+                                                <td>
+                                                    <div style="font-weight: 600; margin-bottom: 4px;"><%= q.QUESTION_BODY %></div>
+                                                    <div style="font-size: 0.82rem; color: var(--text-muted);">
+                                                        A: <%= q.OPTION_1 %> &bull; B: <%= q.OPTION_2 %> &bull; C: <%= q.OPTION_3 %> &bull; D: <%= q.OPTION_4 %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="marks" class="form-control" value="1" min="1" max="100" style="padding: 6px 10px; font-weight: 600;" required>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="3" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                                No questions currently available. Select topics on the left to filter.
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <div id="top-section" class="container">
-        <div class="row">
-            <div class="input-field col s8">
-                <input id="questionSetName" type="text" class="validate" required>
-                <label for="questionSetName">Question Set Name</label>
-            </div>
-            <div class="input-field col s4">
-                <a class="waves-effect waves-light btn" onclick="createQuestionSet()">Create Question Set</a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="input-field col s12">
-                <a class="waves-effect waves-light btn" onclick="searchQuestionsByTopic()">Search Questions by Topic</a>
-            </div>
-        </div>
-        <div id="questionCount"></div> <!-- Question count -->
-    </div>
-
-    <div id="container" class="container">
-        <div id="sidebar">
-            <h3>Topics</h3>
-            <ul class="collection">
-                <% topics.forEach(function(topic) { %>
-                    <li class="collection-item">
-                        <label class="checkbox-container">
-                            <input type="checkbox" name="selectedTopics" value="<%= topic.TOPIC_NAME %>">
-                            <span><%= topic.TOPIC_NAME %></span>
-                            <span class="checkmark"></span>
-                        </label>
-                    </li>
-                <% }) %>
-            </ul>
-        </div>
-
-        <div id="main-content">
-            <% if (questions.length > 0) { %>
-                <form id="questionSetForm">
-                    <table class="striped">
-                        <thead>
-                            <tr>
-                                <th>Question Body</th>
-                                <th>Select</th>
-                                <th>Marks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% questions.forEach(function(question) { %>
-                                <tr>
-                                    <td class="question-body"> <!-- Add class for highlighting -->
-                                        <strong><%= question.QUESTION_BODY %></strong><br>
-                                        Option 1: <%= question.OPTION_1 %><br>
-                                        Option 2: <%= question.OPTION_2 %><br>
-                                        Option 3: <%= question.OPTION_3 %><br>
-                                        Option 4: <%= question.OPTION_4 %>
-                                    </td>
-                                    <td>
-                                        <label>
-                                            <input type="checkbox" name="selectedQuestions" value="<%= question.QUESTION_ID %>">
-                                            <span></span>
-                                        </label>
-                                    </td>
-                                    <td><input type="number" name="marks" placeholder="Marks" required></td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-                </form>
-            <% } else { %>
-                <p>No questions available.</p>
-            <% } %>
-        </div>
-    </div>
-
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-        // Initialize Materialize components
-        M.AutoInit();
+        function selectAllTopics(check) {
+            document.querySelectorAll('input[name="selectedTopics"]').forEach(cb => cb.checked = check);
+        }
 
-        function createQuestionSet() {
-            var form = document.getElementById('questionSetForm');
-            var formData = new FormData(form);
-            var selectedQuestions = [];
-            document.querySelectorAll('input[name="selectedQuestions"]:checked').forEach(function(checkbox) {
-                var questionId = checkbox.value;
-                var markInput = checkbox.closest('tr').querySelector('input[name="marks"]');
-                var mark = markInput.value;
-                selectedQuestions.push({ questionId: questionId, mark: mark });
-            });
-            var questionSetName = document.getElementById('questionSetName').value;
-            var confirmation = confirm("Are you sure you want to create this question set?");
-            if (confirmation) {
-                var data = {
-                    questionSetName: questionSetName,
-                    selectedQuestions: selectedQuestions
-                };
-                fetch('/teacher/create-question-set', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to create question set.');
-                    }
-                })
-                .then(data => {
-                    alert("Question set created successfully!");
-                    console.log('Question set created:', data);
-                })
-                .catch(error => {
-                    console.error('Error creating question set:', error);
-                    alert("Failed to create question set. Please try again.");
-                });
+        function updateSelectedCounter() {
+            const count = document.querySelectorAll('input[name="selectedQuestions"]:checked').length;
+            document.getElementById('selectedCount').textContent = `${count} Questions`;
+        }
+
+        async function filterQuestionsByTopic() {
+            const selected = [];
+            document.querySelectorAll('input[name="selectedTopics"]:checked').forEach(cb => selected.push(cb.value));
+
+            if (selected.length === 0) {
+                alert('Please check at least one topic to filter questions.');
+                return;
             }
-        }
 
-        function searchQuestionsByTopic() {
-            var selectedTopics = [];
-            document.querySelectorAll('input[name="selectedTopics"]:checked').forEach(function(checkbox) {
-                selectedTopics.push(checkbox.value);
-            });
-            if (selectedTopics.length === 0) {
-                alert("Please select at least one topic.");
-            } else {
-                const selectedTopicsstr=selectedTopics.join(',');
-                const url = `/teacher/search-questions-by-topic?selectedTopics=${selectedTopicsStr}`;
-                // Send selectedTopics to the server via POST request
-                fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Network response was not ok.');
-                })
-                .then(data => {
-                    // Handle response from the server
-                    console.log('Response from server:', data);
-                    // Implement logic to update UI with received data
-                })
-                .catch(error => {
-                    console.error('Error:', error.message);
-                });
-            }
-        }
-        
+            const url = `/teacher/search-questions-by-topic?selectedTopics=${encodeURIComponent(selected.join(','))}`;
 
-        // Function to update question count
-        function updateQuestionCount() {
-            var count = document.querySelectorAll('input[name="selectedQuestions"]:checked').length;
-            document.getElementById('questionCount').innerText = count;
-        }
+            try {
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) throw new Error('Search failed');
+                const questions = await res.json();
 
-        // Call updateQuestionCount initially and whenever a question is selected or deselected
-        updateQuestionCount();
-        document.addEventListener('change', updateQuestionCount);
+                const tbody = document.querySelector('#questionsTable tbody');
+                tbody.innerHTML = '';
 
-        // Highlight selected questions
-        document.addEventListener('change', function(event) {
-            if (event.target.type === 'checkbox' && event.target.name === 'selectedQuestions') {
-                var parentRow = event.target.closest('tr');
-                if (event.target.checked) {
-                    parentRow.classList.add('selected-question');
-                } else {
-                    parentRow.classList.remove('selected-question');
+                if (!questions || questions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 36px; color: var(--text-muted);">No questions found for the selected topics.</td></tr>';
+                    updateSelectedCounter();
+                    return;
                 }
-            }
-        });
-    </script>
 
+                questions.forEach(q => {
+                    const tr = document.createElement('tr');
+                    tr.setAttribute('data-question-id', q.QUESTION_ID);
+                    tr.innerHTML = `
+                        <td style="text-align: center;">
+                            <input type="checkbox" name="selectedQuestions" value="${q.QUESTION_ID}" onchange="updateSelectedCounter()" style="accent-color: var(--primary); width: 18px; height: 18px; cursor: pointer;">
+                        </td>
+                        <td>
+                            <div style="font-weight: 600; margin-bottom: 4px;">${q.QUESTION_BODY || ''}</div>
+                            <div style="font-size: 0.82rem; color: var(--text-muted);">
+                                A: ${q.OPTION_1 || ''} &bull; B: ${q.OPTION_2 || ''} &bull; C: ${q.OPTION_3 || ''} &bull; D: ${q.OPTION_4 || ''}
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" name="marks" class="form-control" value="1" min="1" max="100" style="padding: 6px 10px; font-weight: 600;" required>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                updateSelectedCounter();
+            } catch (err) {
+                console.error(err);
+                alert('Error searching questions by topic.');
+            }
+        }
+
+        async function saveQuestionSet() {
+            const setName = document.getElementById('questionSetName').value.trim();
+            if (!setName) {
+                alert('Please enter a Question Set Name.');
+                document.getElementById('questionSetName').focus();
+                return;
+            }
+
+            const checked = document.querySelectorAll('input[name="selectedQuestions"]:checked');
+            if (checked.length === 0) {
+                alert('Please select at least one question to include in this set.');
+                return;
+            }
+
+            const selectedQuestions = [];
+            checked.forEach(cb => {
+                const tr = cb.closest('tr');
+                const marksInput = tr.querySelector('input[name="marks"]');
+                const mark = parseInt(marksInput ? marksInput.value : 1, 10);
+                selectedQuestions.push({
+                    questionId: parseInt(cb.value, 10),
+                    mark: mark || 1
+                });
+            });
+
+            const btn = document.getElementById('saveSetBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Saving Set...';
+
+            try {
+                const response = await fetch('/teacher/create-question-set', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        questionSetName: setName,
+                        selectedQuestions: selectedQuestions
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Question Set created successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Failed to save question set. Please try again.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error saving question set.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Save Question Set</span>';
+            }
+        }
+    </script>
 </body>
 
 </html>
