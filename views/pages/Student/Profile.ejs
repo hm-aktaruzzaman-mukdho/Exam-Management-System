@@ -4,184 +4,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
-    <!-- Material Icons -->
+    <title>My Student Profile | Exam Management System</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+        .profile-container {
+            max-width: 760px;
+            margin: 0 auto;
         }
 
-        #header {
-            background-color: #004985;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .profile-avatar-hero {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
         }
 
-        h2 {
-            margin-top: 20px;
-            text-align: center;
+        .profile-avatar-large {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
         }
 
-        .container {
-            margin-top: 20px;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 40px;
-            background-color: #daf7fd;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        .info-pill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
         }
 
-        label {
-            font-weight: bold;
+        .info-pill {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
         }
 
-        input[type="text"],
-        input[type="password"] {
-            width: calc(100% - 12px);
-            padding: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
+        .info-pill-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
-        .readonly {
-            background-color: #f9f9f9;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .error-message {
-            color: red;
-            margin-top: 5px;
+        .info-pill-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 2px;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <div id="header">
-        <h2>Edit Profile</h2>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon">
+                    <span class="material-icons">school</span>
+                </div>
+                <div class="brand-title">Student Portal</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/student" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Navigation</div>
+                <a href="/student" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/exams" class="sidebar-item">
+                    <span class="material-icons">assignment_turned_in</span>
+                    <span>Exams</span>
+                </a>
+                <a href="/student/create-exam" class="sidebar-item">
+                    <span class="material-icons">add_task</span>
+                    <span>Practice Exam</span>
+                </a>
+                <a href="/student/questions" class="sidebar-item">
+                    <span class="material-icons">menu_book</span>
+                    <span>Question Practice</span>
+                </a>
+                <a href="/student/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/student/profile" class="sidebar-item active">
+                    <span class="material-icons">person</span>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main">
+                <div class="profile-container">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">
+                                <span class="material-icons" style="font-size: 32px; color: var(--primary);">account_circle</span>
+                                Student Profile & Settings
+                            </h1>
+                            <p class="page-subtitle">Manage your personal credentials and view account details</p>
+                        </div>
+                    </div>
+
+                    <% const s = (student && student.length > 0) ? student[0] : {}; %>
+
+                    <div class="card">
+                        <div class="profile-avatar-hero">
+                            <div class="profile-avatar-large">
+                                <%= (s.FIRST_NAME || 'S').charAt(0).toUpperCase() %>
+                            </div>
+                            <div>
+                                <h2 style="font-size: 1.5rem;"><%= s.FIRST_NAME %> <%= s.LAST_NAME %></h2>
+                                <p style="color: var(--text-muted); font-size: 0.92rem;"><%= s.EMAIL %></p>
+                                <span class="user-role-pill" style="margin-top: 6px; display: inline-block;">Enrolled Student</span>
+                            </div>
+                        </div>
+
+                        <!-- Readonly Info Pills -->
+                        <div class="info-pill-grid">
+                            <div class="info-pill">
+                                <div class="info-pill-label">Student ID</div>
+                                <div class="info-pill-value">#<%= s.STUDENT_ID %></div>
+                            </div>
+                            <div class="info-pill">
+                                <div class="info-pill-label">Academic Level</div>
+                                <div class="info-pill-value"><%= s.LEVEL_NAME %></div>
+                            </div>
+                            <div class="info-pill">
+                                <div class="info-pill-label">Age</div>
+                                <div class="info-pill-value"><%= s.AGE %> Years</div>
+                            </div>
+                            <div class="info-pill">
+                                <div class="info-pill-label">Member Since</div>
+                                <div class="info-pill-value"><%= s.REGISTERED_DATE ? new Date(s.REGISTERED_DATE).toLocaleDateString() : 'N/A' %></div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Form -->
+                        <h2 style="font-size: 1.2rem; margin-bottom: 16px;">Update Name & Credentials</h2>
+                        <form id="editForm" onsubmit="handleProfileUpdate(event)">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label" for="firstName">First Name</label>
+                                    <input type="text" id="firstName" name="firstName" class="form-control" value="<%= s.FIRST_NAME %>" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="lastName">Last Name</label>
+                                    <input type="text" id="lastName" name="lastName" class="form-control" value="<%= s.LAST_NAME %>" required>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label" for="password">New Password</label>
+                                    <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to keep unchanged">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Repeat new password">
+                                    <div id="passwordMismatchError" style="display: none; color: #DC2626; font-size: 0.8rem; margin-top: 4px;">Passwords do not match</div>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="saveBtn" class="btn btn-primary" style="margin-top: 8px;">
+                                <span class="material-icons" style="font-size: 18px;">save</span>
+                                <span>Save Changes</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <!-- Content -->
-    <div class="container">
-        <form id="editForm">
-            <div class="input-field">
-                <input type="text" id="firstName" name="firstName" value="<%= student[0].FIRST_NAME %>" required>
-                <label for="firstName"><strong>First Name</strong></label>
-            </div>
-
-            <div class="input-field">
-                <input type="text" id="lastName" name="lastName" value="<%= student[0].LAST_NAME %>" required>
-                <label for="lastName"><strong>Last Name</strong></label>
-            </div>
-
-            <div class="input-field">
-                <input type="password" id="password" name="password" required>
-                <label for="password"><strong>Password</strong></label>
-            </div>
-
-            <div class="input-field">
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-                <label for="confirmPassword"><strong>Confirm Password</strong></label>
-                <span id="passwordError" class="error-message"></span>
-            </div>
-
-            <div class="readonly"><strong>Student ID:</strong> <%= student[0].STUDENT_ID %></div>
-            <div class="readonly"><strong>Email: </strong><%= student[0].EMAIL %></div>
-            <div class="readonly"><strong>Age:</strong> <%= student[0].AGE %></div>
-            <div class="readonly"><strong>Level Name:</strong> <%= student[0].LEVEL_NAME %></div>
-            <div class="readonly"><strong>Registered Date:</strong> <%= student[0].REGISTERED_DATE %></div>
-
-            <button type="submit" id="saveChangesButton">Save Changes</button>
-        </form>
-    </div>
-
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Materialize Form Inputs
-            M.updateTextFields();
+        async function handleProfileUpdate(e) {
+            e.preventDefault();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('passwordMismatchError');
 
-            // Handle Form Submission
-            document.getElementById('editForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-                const formData = new FormData(this);
+            errorDiv.style.display = 'none';
 
-                // Check if passwords match
-                const password = formData.get('password');
-                const confirmPassword = formData.get('confirmPassword');
-                if (password !== confirmPassword) {
-                    document.getElementById('passwordError').textContent = "Passwords do not match";
-                    return;
+            if (password && password !== confirmPassword) {
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Saving...';
+
+            try {
+                const payload = { firstName, lastName };
+                if (password) {
+                    payload.password = password;
                 }
 
-                // If passwords match, send data to server
-                fetch('/update-profile', {
+                const res = await fetch('/student/update-profile', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: formData
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            // Optionally, handle successful response
-                            console.log('Profile updated successfully');
-                        } else {
-                            // Optionally, handle error response
-                            console.error('Failed to update profile');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            // Check if passwords match on input change
-            document.getElementById('confirmPassword').addEventListener('input', function () {
-                const password = document.getElementById('password').value;
-                const confirmPassword = this.value;
-                const passwordError = document.getElementById('passwordError');
-
-                if (password !== confirmPassword) {
-                    passwordError.textContent = "Passwords do not match";
-                    document.getElementById('saveChangesButton').disabled = true;
+                if (res.ok) {
+                    alert('Profile updated successfully!');
+                    window.location.reload();
                 } else {
-                    passwordError.textContent = "";
-                    document.getElementById('saveChangesButton').disabled = false;
+                    alert('Failed to update profile.');
                 }
-            });
-        });
+            } catch (err) {
+                console.error(err);
+                alert('Network error updating profile.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Save Changes</span>';
+            }
+        }
     </script>
-
 </body>
 
 </html>

@@ -1,127 +1,159 @@
 const express = require('express');
 const router = express.Router();
-const oracledb = require("oracledb");
-
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-
-const dbConfig = require('../dbconfig');
-
+const db = require('../db');
 const requireLogin = require('../middleware/requireLogin');
 
-// Route for viewing assignments
-router.get('/assignments',requireLogin, async (req, res) => {
-	try {
+const answerUploadDir = path.join(__dirname, '../uploads/Assignment_Answer');
+const questionUploadDir = path.join(__dirname, '../uploads/Assignment_Question');
 
-		const connection = await oracledb.getConnection(dbConfig);
-		const result = await connection.execute(
-			`SELECT * FROM ASSIGNMENT`,
-			{},
-			{ outFormat: oracledb.OUT_FORMAT_OBJECT }
-		);
-
-		console.log(result.rows); // Accessing '
-		res.render('pages/Student/Assignments', { assignments: result.rows });
-	} catch (err) {
-		console.log(err);
-	}
-});
-
-// Route for viewing a specific assignments
-
-router.get('/assignments/:assignmentId',requireLogin, async (req, res) => {
-	const assignmentId = req.params.assignmentId;
-
-	try {
-		// Create a connection to the Oracle database
-		const connection = await oracledb.getConnection(dbConfig);
-
-		// Prepare SQL query to fetch assignment details
-		const sql = `SELECT * FROM assignment WHERE assignment_id = :assignmentId`;
-
-		// Bind the assignmentId parameter
-		const result = await connection.execute(sql, [assignmentId]);
-
-		// Close the connection
-		await connection.close();
-
-		// Extract assignment details from the query result
-		const assignment = result.rows[0];
-
-		if (!assignment) {
-			// If assignment is not found, send a 404 error response
-			res.status(404).send('Assignment not found');
-			return;
-		}
-
-		//res.send("Your assignment id is: " + assignmentId);
-
-		// Render the assignment_details.ejs page with the assignment details
-		res.render('pages/Student/Assignment_Details', { assignment: assignment });
-
-	} catch (error) {
-		// Handle any errors that occur during the database query
-		console.error('Error fetching assignment:', error);
-		res.status(500).send('Internal Server Error');
-	}
-});
-
-
-
-// Multer storage configuration
-const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, 'D:/Code/Database_Project/Scratch/uploads/Assignment_Answer'); // Set your destination folder where files will be stored
-	},
-	filename: function (req, file, cb) {
-		// Constructing the filename with the specified naming convention
-		const fileName = `assignment_answer_${req.params.assignmentId}_${req.session.userId}${path.extname(file.originalname)}`;
-
-		// Check if a file with the same name already exists
-		fs.access(path.join('D:/Code/Database_Project/Scratch/uploads/Assignment_Answer', fileName), fs.constants.F_OK, (err) => {
-			if (!err) {
-				// If file exists, delete it before saving the new one
-				fs.unlink(path.join('D:/Code/Database_Project/Scratch/uploads/Assignment_Answer', fileName), (unlinkErr) => {
-					if (unlinkErr) return cb(unlinkErr);
-					cb(null, fileName);
-				});
-			} else {
-				cb(null, fileName);
-			}
-		});
-	}
-});
-
-router.get('/assignments/:assignment_id/submission',requireLogin, async (req, res) => {
-	const filePath = `D:/Code/Database_Project/Scratch/uploads/Assignment_Answer/assignment_answer_${req.params.assignment_id}_${req.session.userId}.pdf`;
-
-	if (fs.existsSync(filePath)) {
-		// If the file exists, send it for download
-		res.download(filePath);
-	} else {
-		// If the file does not exist, send an error response
-		res.status(404).send('File not found.You haven\'t uploaded any assignment answer yet.');
-	}
-});
-
-router.get('/assignments/:assignment_id/download',requireLogin, async (req, res) => {
-	const par=req.params.assignment_id;
-    const filePath = `D:/Code/Database_Project/Scratch/uploads/Assignment_Question/assignment_questions_${par}.pdf`;
-
-    if (fs.existsSync(filePath)) {
-        // If the file exists, send it for download
-        res.download(filePath);
-    } else {
-        // If the file does not exist, send an error response
-        res.status(404).send('File not found.Maybe the teacher hasn\' uploaded the assignment file yet.');
+// Ensure upload directories exist
+[answerUploadDir, questionUploadDir].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
     }
 });
 
-const upload = multer({ storage: storage });
-
-// Route to handle file upload
-router.post('/assignments/:assignmentId/upload/',requireLogin, upload.single('assignmentAnswer'), (req, res) => {
-	res.send('File uploaded successfully');
+// Route for viewing assignments
+router.get('/assignments', requireLogin, async (req, res) => {
+    try {
+        const result = await db.execute(`SELECT * FROM ASSIGNMENT ORDER BY ASSIGNMENT_ID DESC`);
+        res.render('pages/Student/Assignments', { assignments: result.rows || [] });
+    } catch (err) {
+        console.error("Error loading student assignments:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
+
+// Route for viewing a specific assignment
+router.get('/assignments/:assignmentId', requireLogin, async (req, res) => {
+    const assignmentId = parseInt(req.params.assignmentId, 10);
+    const studentId = req.session.userId;
+    try {
+        const result = await db.execute(
+            `SELECT a.*, sub.MARKS_OBTAINED, sub.MARKS_OBTAINED AS OBTAINED_MARKS, 
+                    sub.FEEDBACK, sub.SUBMISSION_TIME, sub.SUBMISSION_ATTEMPT
+             FROM ASSIGNMENT a
+             LEFT JOIN ASSIGNMENT_SUBMISSION sub 
+               ON (a.ASSIGNMENT_ID = sub.ASSIGNMENT_ID AND sub.STUDENT_ID = :studentId)
+             WHERE a.ASSIGNMENT_ID = :assignmentId`,
+            { assignmentId, studentId }
+        );
+
+        const assignment = result.rows && result.rows[0];
+        if (!assignment) {
+            return res.status(404).send('Assignment not found');
+        }
+
+        res.render('pages/Student/Assignment_Details', { assignment });
+    } catch (error) {
+        console.error('Error fetching assignment details:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// Multer storage configuration for student answers
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, answerUploadDir);
+    },
+    filename: function (req, file, cb) {
+        const fileName = `assignment_answer_${req.params.assignmentId}_${req.session.userId}${path.extname(file.originalname) || '.pdf'}`;
+        const targetPath = path.join(answerUploadDir, fileName);
+        if (fs.existsSync(targetPath)) {
+            try {
+                fs.unlinkSync(targetPath);
+            } catch (e) {
+                console.error("Error unlinking old file:", e);
+            }
+        }
+        cb(null, fileName);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 25 * 1024 * 1024 } // 25MB max
+});
+
+router.get('/assignments/:assignment_id/submission', requireLogin, async (req, res) => {
+    const assignmentId = req.params.assignment_id;
+    const userId = req.session.userId;
+    // Check common extensions
+    const extensions = ['.pdf', '.doc', '.docx', '.png', '.jpg'];
+    let foundPath = null;
+
+    for (const ext of extensions) {
+        const candidate = path.join(answerUploadDir, `assignment_answer_${assignmentId}_${userId}${ext}`);
+        if (fs.existsSync(candidate)) {
+            foundPath = candidate;
+            break;
+        }
+    }
+
+    if (foundPath) {
+        return res.download(foundPath);
+    } else {
+        return res.status(404).send('File not found. You haven\'t uploaded any assignment answer yet.');
+    }
+});
+
+router.get('/assignments/:assignment_id/download', requireLogin, async (req, res) => {
+    const assignmentId = req.params.assignment_id;
+    const extensions = ['.pdf', '.doc', '.docx'];
+    let foundPath = null;
+
+    for (const ext of extensions) {
+        const candidate = path.join(questionUploadDir, `assignment_questions_${assignmentId}${ext}`);
+        if (fs.existsSync(candidate)) {
+            foundPath = candidate;
+            break;
+        }
+    }
+
+    if (foundPath) {
+        return res.download(foundPath);
+    } else {
+        return res.status(404).send('File not found. Maybe the teacher hasn\'t uploaded the assignment file yet.');
+    }
+});
+
+// Route to handle student file upload
+router.post('/assignments/:assignmentId/upload', requireLogin, upload.single('assignmentAnswer'), async (req, res) => {
+    try {
+        const assignmentId = parseInt(req.params.assignmentId, 10);
+        const studentId = req.session.userId;
+
+        // Record submission in database
+        await db.withTransaction(async (conn) => {
+            const existing = await conn.execute(
+                `SELECT 1 FROM ASSIGNMENT_SUBMISSION WHERE STUDENT_ID = :studentId AND ASSIGNMENT_ID = :assignmentId`,
+                { studentId, assignmentId }
+            );
+
+            if (existing.rows && existing.rows.length > 0) {
+                await conn.execute(
+                    `UPDATE ASSIGNMENT_SUBMISSION 
+                     SET SUBMISSION_TIME = SYSDATE, SUBMISSION_ATTEMPT = SUBMISSION_ATTEMPT + 1
+                     WHERE STUDENT_ID = :studentId AND ASSIGNMENT_ID = :assignmentId`,
+                    { studentId, assignmentId }
+                );
+            } else {
+                await conn.execute(
+                    `INSERT INTO ASSIGNMENT_SUBMISSION (STUDENT_ID, ASSIGNMENT_ID, SUBMISSION_TIME, SUBMISSION_ATTEMPT)
+                     VALUES (:studentId, :assignmentId, SYSDATE, 1)`,
+                    { studentId, assignmentId }
+                );
+            }
+        });
+
+        res.status(200).send('File uploaded successfully');
+    } catch (err) {
+        console.error("Error recording assignment upload:", err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 module.exports = router;

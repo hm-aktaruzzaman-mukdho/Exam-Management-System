@@ -4,209 +4,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Assignments</title>
-    <!-- Material Icons -->
+    <title>My Coursework & Assignments | Student Portal</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Material Theme CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        #header {
-            background-color: #004985;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .container {
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        th,
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        tr:hover {
-            background-color: #79eee7;
-        }
-
-        .hide {
+        .tab-pane {
             display: none;
+            animation: fadeIn 0.2s ease;
         }
 
-        .hide-button {
-            background-color: #ccc;
+        .tab-pane.active {
+            display: block;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <div id="header">
-        <h2>All Assignments</h2>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon">
+                    <span class="material-icons">school</span>
+                </div>
+                <div class="brand-title">Student Portal</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/student" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Navigation</div>
+                <a href="/student" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/exams" class="sidebar-item">
+                    <span class="material-icons">assignment_turned_in</span>
+                    <span>Exams</span>
+                </a>
+                <a href="/student/create-exam" class="sidebar-item">
+                    <span class="material-icons">add_task</span>
+                    <span>Practice Exam</span>
+                </a>
+                <a href="/student/questions" class="sidebar-item">
+                    <span class="material-icons">menu_book</span>
+                    <span>Question Practice</span>
+                </a>
+                <a href="/student/assignments" class="sidebar-item active">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/student/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: var(--primary);">assignment</span>
+                            Coursework & Assignments
+                        </h1>
+                        <p class="page-subtitle">Track project deadlines, review instructions, and submit your homework documents</p>
+                    </div>
+                </div>
+
+                <%
+                    const now = new Date();
+                    let dueCount = 0;
+                    let pastCount = 0;
+
+                    (assignments || []).forEach(a => {
+                        const deadline = new Date(a.SUBMISSION_DEADLINE);
+                        if (now <= deadline) dueCount++;
+                        else pastCount++;
+                    });
+                %>
+
+                <div class="tab-bar">
+                    <button class="tab-btn active" onclick="switchTab('due')">
+                        Due Assignments (<%= dueCount %>)
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('past')">
+                        Past Deadlines (<%= pastCount %>)
+                    </button>
+                </div>
+
+                <!-- Due Pane -->
+                <div id="pane-due" class="tab-pane active">
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Assignment Title</th>
+                                        <th>Topic</th>
+                                        <th>Level</th>
+                                        <th>Marks</th>
+                                        <th>Deadline</th>
+                                        <th>Time Left</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let hasDue = false; %>
+                                    <% (assignments || []).forEach(a => { %>
+                                        <% const dl = new Date(a.SUBMISSION_DEADLINE); %>
+                                        <% if (now <= dl) { %>
+                                            <% hasDue = true; %>
+                                            <tr>
+                                                <td><strong>#<%= a.ASSIGNMENT_ID %></strong></td>
+                                                <td>
+                                                    <div style="font-weight: 600;"><%= a.ASSIGNMENT_NAME %></div>
+                                                    <div style="font-size: 0.78rem; color: var(--text-muted);"><%= a.ASSIGNMENT_DETAILS ? a.ASSIGNMENT_DETAILS.substring(0, 60) + '...' : '' %></div>
+                                                </td>
+                                                <td><span class="badge" style="background: #F1F5F9; color: var(--text-muted);"><%= a.TOPIC_NAME %></span></td>
+                                                <td><%= a.LEVEL_NAME %></td>
+                                                <td><span class="badge" style="background: #EEF2FF; color: var(--primary);"><%= a.TOTAL_MARKS %> Pts</span></td>
+                                                <td><%= dl.toLocaleString() %></td>
+                                                <td id="time-left-<%= a.ASSIGNMENT_ID %>" style="font-weight: 600; color: #B45309;">Calculating...</td>
+                                                <td style="text-align: right;">
+                                                    <a href="/student/assignments/<%= a.ASSIGNMENT_ID %>" class="btn btn-primary btn-sm">
+                                                        <span>Submit Answer</span>
+                                                        <span class="material-icons" style="font-size: 16px;">upload_file</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% }); %>
+                                    <% if (!hasDue) { %>
+                                        <tr>
+                                            <td colspan="8" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                                <span class="material-icons" style="font-size: 40px; color: var(--text-light); display: block; margin-bottom: 8px;">task_alt</span>
+                                                All assignments are up to date! No pending tasks.
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Pane -->
+                <div id="pane-past" class="tab-pane">
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Assignment Title</th>
+                                        <th>Topic</th>
+                                        <th>Level</th>
+                                        <th>Marks</th>
+                                        <th>Deadline</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let hasPast = false; %>
+                                    <% (assignments || []).forEach(a => { %>
+                                        <% const dl = new Date(a.SUBMISSION_DEADLINE); %>
+                                        <% if (now > dl) { %>
+                                            <% hasPast = true; %>
+                                            <tr>
+                                                <td><strong>#<%= a.ASSIGNMENT_ID %></strong></td>
+                                                <td>
+                                                    <div style="font-weight: 600;"><%= a.ASSIGNMENT_NAME %></div>
+                                                </td>
+                                                <td><span class="badge" style="background: #F1F5F9; color: var(--text-muted);"><%= a.TOPIC_NAME %></span></td>
+                                                <td><%= a.LEVEL_NAME %></td>
+                                                <td><span class="badge" style="background: #F1F5F9; color: var(--text-muted);"><%= a.TOTAL_MARKS %> Pts</span></td>
+                                                <td><%= dl.toLocaleDateString() %></td>
+                                                <td style="text-align: right;">
+                                                    <a href="/student/assignments/<%= a.ASSIGNMENT_ID %>" class="btn btn-outline btn-sm">
+                                                        <span>View Details</span>
+                                                        <span class="material-icons" style="font-size: 16px;">visibility</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% }); %>
+                                    <% if (!hasPast) { %>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                                No past assignments found.
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
-
-    <!-- Content -->
-    <div class="container">
-
-        <h3>Due Assignments</h3>
-        <button onclick="toggleTable('due-assignment-table')" id="due-assignment-toggle" class="hide-button">Hide Table</button>
-        <table id="due-assignment-table">
-            <thead>
-                <tr>
-                    <th>Assignment ID</th>
-                    <th>Assignment Name</th>
-                    <th>Topic Name</th>
-                    <th>Level Name</th>
-                    <th>Assignment Details</th>
-                    <th>Submission Deadline</th>
-                    <th>Total Marks</th>
-                    <th>Teacher ID</th>
-                    <th>Remaining Time</th> <!-- New column for remaining time -->
-                </tr>
-            </thead>
-            <tbody>
-                <% assignments.forEach(assignment => { %>
-                    <% const submissionDeadline = new Date(assignment.SUBMISSION_DEADLINE); %>
-                    <% const currentTime = new Date(); %>
-                    <% if (currentTime <= submissionDeadline) { %>
-                        <tr onclick="redirectToAssignmentDetails('<%= assignment.ASSIGNMENT_ID %>')" style="cursor: pointer;">
-                            <td><%= assignment.ASSIGNMENT_ID %></td>
-                            <td><%= assignment.ASSIGNMENT_NAME %></td>
-                            <td><%= assignment.TOPIC_NAME %></td>
-                            <td><%= assignment.LEVEL_NAME %></td>
-                            <td><%= assignment.ASSIGNMENT_DETAILS %></td>
-                            <td><%= assignment.SUBMISSION_DEADLINE %></td>
-                            <td><%= assignment.TOTAL_MARKS %></td>
-                            <td><%= assignment.TEACHER_ID %></td>
-                            <td id="remaining-time-<%= assignment.ASSIGNMENT_ID %>"></td> <!-- Leave it empty initially -->
-                        </tr>
-                    <% } %>
-                <% }); %>
-            </tbody>
-        </table>
-
-        <h3>Past Assignments</h3>
-        <button onclick="toggleTable('past-assignment-table')" id="past-assignment-toggle" class="hide-button">Hide Table</button>
-        <table id="past-assignment-table">
-            <thead>
-                <tr>
-                    <th>Assignment ID</th>
-                    <th>Assignment Name</th>
-                    <th>Topic Name</th>
-                    <th>Level Name</th>
-                    <th>Assignment Details</th>
-                    <th>Submission Deadline</th>
-                    <th>Total Marks</th>
-                    <th>Teacher ID</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% assignments.forEach(assignment => { %>
-                    <% const submissionDeadline = new Date(assignment.SUBMISSION_DEADLINE); %>
-                    <% const currentTime = new Date(); %>
-                    <% if (currentTime > submissionDeadline) { %>
-                        <tr onclick="redirectToAssignmentDetails('<%= assignment.ASSIGNMENT_ID %>')" style="cursor: pointer;">
-                            <td><%= assignment.ASSIGNMENT_ID %></td>
-                            <td><%= assignment.ASSIGNMENT_NAME %></td>
-                            <td><%= assignment.TOPIC_NAME %></td>
-                            <td><%= assignment.LEVEL_NAME %></td>
-                            <td><%= assignment.ASSIGNMENT_DETAILS %></td>
-                            <td><%= assignment.SUBMISSION_DEADLINE %></td>
-                            <td><%= assignment.TOTAL_MARKS %></td>
-                            <td><%= assignment.TEACHER_ID %></td>
-                        </tr>
-                    <% } %>
-                <% }); %>
-            </tbody>
-        </table>
-
-    </div>
-
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
     <script>
-        function redirectToAssignmentDetails(assignmentId) {
-            window.location.href = '/student/assignments/' + assignmentId; // Replace '/assignment/' with the actual route for assignment details
+        function switchTab(key) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+            const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(key));
+            if (targetBtn) targetBtn.classList.add('active');
+
+            const targetPane = document.getElementById('pane-' + key);
+            if (targetPane) targetPane.classList.add('active');
         }
 
-        function toggleTable(tableId) {
-            var table = document.getElementById(tableId);
-            var toggleButton = document.getElementById(tableId + '-toggle');
-            if (table.classList.contains('hide')) {
-                table.classList.remove('hide');
-                toggleButton.textContent = 'Hide Table';
-                toggleButton.classList.remove('hide-button');
-            } else {
-                table.classList.add('hide');
-                toggleButton.textContent = 'Show Table'; // Change button text to "Show Table"
-                toggleButton.classList.add('hide-button');
-            }
+        function formatDuration(diffSeconds) {
+            if (diffSeconds <= 0) return "Expired";
+            const days = Math.floor(diffSeconds / 86400);
+            const hours = Math.floor((diffSeconds % 86400) / 3600);
+            const minutes = Math.floor((diffSeconds % 3600) / 60);
+
+            if (days > 0) return `${days}d ${hours}h left`;
+            if (hours > 0) return `${hours}h ${minutes}m left`;
+            return `${minutes}m left`;
         }
 
-        function formatRemainingTime(startTime, endTime) {
-            var diff = Math.abs(endTime - startTime) / 1000; // Difference in seconds
-
-            var days = Math.floor(diff / 86400); // 1 day = 86400 seconds
-            var hours = Math.floor((diff % 86400) / 3600); // 1 hour = 3600 seconds
-            var minutes = Math.floor(((diff % 86400) % 3600) / 60); // 1 minute = 60 seconds
-            var seconds = Math.floor(((diff % 86400) % 3600) % 60);
-
-            if (days > 0) {
-                return days + " days, " + hours + " hours, " + minutes + " minutes";
-            } else {
-                return hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
-            }
-        }
-
-        function updateRemainingTime() {
-            var currentTime = new Date();
-            <% assignments.forEach(assignment => { %>
-                var assignmentId = '<%= assignment.ASSIGNMENT_ID %>';
-                var submissionDeadline = new Date('<%= assignment.SUBMISSION_DEADLINE %>');
-                var remainingTimeElement = document.getElementById('remaining-time-' + assignmentId);
-                var remainingTime = formatRemainingTime(currentTime, submissionDeadline);
-                if (remainingTimeElement) {
-                    remainingTimeElement.innerText = remainingTime;
-                    if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
-                        window.location.reload(); // Reload the page if remaining time is 0 seconds
+        function updateDeadlines() {
+            const now = new Date();
+            <% (assignments || []).forEach(a => { %>
+                (function() {
+                    const dl = new Date('<%= a.SUBMISSION_DEADLINE %>');
+                    const el = document.getElementById('time-left-<%= a.ASSIGNMENT_ID %>');
+                    if (el) {
+                        const diff = (dl - now) / 1000;
+                        el.textContent = formatDuration(diff);
                     }
-                }
+                })();
             <% }); %>
         }
 
-        setInterval(updateRemainingTime, 1000);
+        setInterval(updateDeadlines, 1000);
+        updateDeadlines();
     </script>
-
 </body>
 
 </html>

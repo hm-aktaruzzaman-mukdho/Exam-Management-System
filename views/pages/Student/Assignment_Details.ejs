@@ -1,90 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assignment Details</title>
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <title>Assignment Details | Student Portal</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-       #remaining-time{
-        text-shadow: 5px;
-        color: brown;
-       }
+        .assignment-hero {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .drop-zone {
+            border: 2px dashed #CBD5E1;
+            border-radius: var(--radius-lg);
+            padding: 36px 20px;
+            text-align: center;
+            background: #F8FAFC;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .drop-zone-icon {
+            font-size: 48px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1 class="center-align">Assignment Details</h1>
-        <div class="row">
-            <div class="col s12">
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title"><%= assignment.ASSIGNMENT_NAME %></span>
-                        <p><strong>Due Date:</strong> <%= assignment.SUBMISSION_DEADLINE %></p>
-                        <p><strong>Created By:</strong> <%= assignment.TEACHER_ID %></p>
-                        <p><strong>Total Marks:</strong><%= assignment.TOTAL_MARKS %></p>
-                        <p><strong>Obtained Marks:</strong><%= assignment.OBTAINED_MARKS %></p>
-                        <p id="remaining-time"><strong>Remaining Time:</strong></p>
-                        <p><a href="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/submission" class="waves-effect waves-light btn">Download Submitted PDF</a></p>
-                        <!-- Add any additional details you want to display about the assignment -->
-                    </div>
-                    <div class="card-action">
-                        <!-- Link to download the assignment PDF -->
-                        <a href="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/download" class="waves-effect waves-light btn">Download Assignment PDF</a>
-                    </div>
+
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon">
+                    <span class="material-icons">school</span>
                 </div>
-                <!-- Form to upload the assignment answer PDF -->
-                <form action="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/upload" method="POST" enctype="multipart/form-data">
-                    <div class="file-field input-field">
-                        <div class="btn">
-                            <span>Upload Assignment Answer (PDF)</span>
-                            <input type="file" id="assignmentAnswer" name="assignmentAnswer" accept=".pdf" required>
+                <div class="brand-title">Student Portal</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/student/assignments" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">arrow_back</span>
+                    <span>All Assignments</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Navigation</div>
+                <a href="/student" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/exams" class="sidebar-item">
+                    <span class="material-icons">assignment_turned_in</span>
+                    <span>Exams</span>
+                </a>
+                <a href="/student/create-exam" class="sidebar-item">
+                    <span class="material-icons">add_task</span>
+                    <span>Practice Exam</span>
+                </a>
+                <a href="/student/questions" class="sidebar-item">
+                    <span class="material-icons">menu_book</span>
+                    <span>Question Practice</span>
+                </a>
+                <a href="/student/assignments" class="sidebar-item active">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/student/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main" style="max-width: 860px; margin: 0 auto; width: 100%;">
+                <div class="assignment-hero">
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                        <div>
+                            <span class="badge" style="background: #EEF2FF; color: var(--primary); margin-bottom: 10px;">
+                                Assignment #<%= assignment.ASSIGNMENT_ID %>
+                            </span>
+                            <h1 style="font-size: 1.85rem;"><%= assignment.ASSIGNMENT_NAME %></h1>
                         </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text">
+
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Marks Awarded</div>
+                            <div style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--primary);">
+                                <%= assignment.OBTAINED_MARKS != null ? assignment.OBTAINED_MARKS : '--' %>
+                                <span style="font-size: 1rem; color: var(--text-light);">/ <%= assignment.TOTAL_MARKS %></span>
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" class="waves-effect waves-light btn">Submit</button>
-                </form>
-            </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; padding: 16px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); margin-bottom: 24px;">
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Submission Deadline</span>
+                            <strong style="font-size: 0.95rem;"><%= new Date(assignment.SUBMISSION_DEADLINE).toLocaleString() %></strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Remaining Time</span>
+                            <strong id="remainingTimeBadge" style="font-size: 0.95rem; color: #B45309;">Calculating...</strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Instructor Prompt</span>
+                            <a href="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/download" class="btn btn-outline btn-sm" style="margin-top: 4px;">
+                                <span class="material-icons" style="font-size: 16px;">download</span>
+                                <span>Get Question PDF</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <% if (assignment.ASSIGNMENT_DETAILS) { %>
+                        <div style="margin-bottom: 24px;">
+                            <h2 style="font-size: 1.1rem; margin-bottom: 8px;">Instructions</h2>
+                            <p style="color: var(--text-muted); line-height: 1.6;"><%= assignment.ASSIGNMENT_DETAILS %></p>
+                        </div>
+                    <% } %>
+
+                    <% if (assignment.FEEDBACK) { %>
+                        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 24px;">
+                            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #166534; margin-bottom: 6px;">
+                                <span class="material-icons" style="font-size: 20px;">rate_review</span>
+                                <span>Instructor Review & Feedback</span>
+                            </div>
+                            <p style="color: #15803D; margin: 0; line-height: 1.5;"><%= assignment.FEEDBACK %></p>
+                        </div>
+                    <% } %>
+
+                    <!-- Upload Form -->
+                    <h2 style="font-size: 1.1rem; margin-bottom: 12px;">Submit Homework Response</h2>
+                    <form action="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/upload" method="POST" enctype="multipart/form-data">
+                        <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+                            <span class="material-icons drop-zone-icon">cloud_upload</span>
+                            <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 4px;">Click to browse and upload answer file</div>
+                            <div id="fileNameDisplay" style="color: var(--text-muted); font-size: 0.85rem;">Accepts PDF, DOCX, DOC files (Max 25MB)</div>
+                            <input type="file" id="fileInput" name="assignmentAnswer" accept=".pdf,.doc,.docx" style="display: none;" onchange="updateFileLabel(this)" required>
+                        </div>
+
+                        <div style="display: flex; gap: 14px; align-items: center;">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="material-icons" style="font-size: 18px;">upload</span>
+                                <span>Upload Answer Document</span>
+                            </button>
+
+                            <a href="/student/assignments/<%= assignment.ASSIGNMENT_ID %>/submission" class="btn btn-secondary">
+                                <span class="material-icons" style="font-size: 18px;">file_download</span>
+                                <span>Download My Submitted PDF</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </main>
         </div>
     </div>
-    <!-- Materialize JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
     <script>
-        function formatRemainingTime(startTime, endTime) {
-            var diff = Math.abs(endTime - startTime) / 1000; // Difference in seconds
-
-            var days = Math.floor(diff / 86400); // 1 day = 86400 seconds
-            var hours = Math.floor((diff % 86400) / 3600); // 1 hour = 3600 seconds
-            var minutes = Math.floor(((diff % 86400) % 3600) / 60); // 1 minute = 60 seconds
-            var seconds = Math.floor(((diff % 86400) % 3600) % 60);
-
-            if (days > 0) {
-                return days + " days, " + hours + " hours, " + minutes + " minutes";
-            } 
-            else {
-                return hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+        function updateFileLabel(input) {
+            if (input.files && input.files.length > 0) {
+                document.getElementById('fileNameDisplay').innerHTML = `<strong>Selected file:</strong> ${input.files[0].name} (${(input.files[0].size / 1024 / 1024).toFixed(2)} MB)`;
             }
         }
 
-        function updateRemainingTime() {
-            var currentTime = new Date();
-            var submissionDeadline = new Date('<%= assignment.SUBMISSION_DEADLINE %>');
-            var remainingTimeElement = document.getElementById('remaining-time');
-            var remainingTime = formatRemainingTime(currentTime, submissionDeadline);
-            if (remainingTimeElement) {
-                remainingTimeElement.innerText = "Remaining Time: " + remainingTime;
-                if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
-                    window.location.reload(); // Reload the page if remaining time is 0 seconds
-                }
+        function formatDuration(diffSeconds) {
+            if (diffSeconds <= 0) return "Deadline Passed";
+            const days = Math.floor(diffSeconds / 86400);
+            const hours = Math.floor((diffSeconds % 86400) / 3600);
+            const minutes = Math.floor((diffSeconds % 3600) / 60);
+            const seconds = Math.floor(diffSeconds % 60);
+
+            if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+            if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+            return `${minutes}m ${seconds}s`;
+        }
+
+        function updateRemaining() {
+            const dl = new Date('<%= assignment.SUBMISSION_DEADLINE %>');
+            const diff = (dl - new Date()) / 1000;
+            const el = document.getElementById('remainingTimeBadge');
+            if (el) {
+                el.textContent = formatDuration(diff);
             }
         }
 
-        // Call the updateRemainingTime function every second
-        setInterval(updateRemainingTime, 1000);
+        setInterval(updateRemaining, 1000);
+        updateRemaining();
     </script>
 </body>
+
 </html>

@@ -1,199 +1,166 @@
 const express = require('express');
 const router = express.Router();
-const oracledb = require("oracledb");
-
-const dbConfig = require('../dbconfig');
-
+const db = require('../db');
 const requireLogin = require('../middleware/requireLogin');
 
-
 router.post("/create-question", requireLogin, async (req, res) => {
-	console.log("Create Question");
-	try {
-		// Extract new user details from the request body
-		const { questionType, questionBody, options, correctAnswer, academicLevel, selectedTopic } = req.body;
+    try {
+        const { questionType, questionBody, options, correctAnswer, academicLevel, selectedTopic } = req.body;
+        const id = req.session.userId;
+        const accessibilityLevel = '1';
 
-		console.log(questionType, questionBody, options, correctAnswer, academicLevel, selectedTopic);
-		//query to find the id of the teacher.
-		let option1;
-		let option2;
-		let option3;
-		let option4;
-		if (questionType == 'FIB') {
-			option1 = "";
-			option2 = "";
-			option3 = "";
-			option4 = "";
-		}
-		else if (questionType == 'MCQ') {
-			option1 = options[0];
-			option2 = options[1];
-			option3 = options[2];
-			option4 = options[3];
-		}
-		else {
-			option1 = options[0];
-			option2 = options[1];
-			option3 = "";
-			option4 = "";
-		}
-		const accessibilityLevel = 1;
+        let option1 = "";
+        let option2 = "";
+        let option3 = "";
+        let option4 = "";
 
-		//Connect to the Oracle database
-		const connection = await oracledb.getConnection(dbConfig);
+        if (questionType === 'MCQ' && Array.isArray(options)) {
+            option1 = options[0] || "";
+            option2 = options[1] || "";
+            option3 = options[2] || "";
+            option4 = options[3] || "";
+        } else if (questionType === 'TF' && Array.isArray(options)) {
+            option1 = options[0] || "True";
+            option2 = options[1] || "False";
+        }
 
-		// let existingemail = req.session.user;
-		// //console.log(existingemail);
+        await db.withTransaction(async (conn) => {
+            await conn.execute(
+                `INSERT INTO QUESTION (TYPE_NAME, QUESTION_BODY, OPTION_1, OPTION_2, OPTION_3, OPTION_4, CORRECT_ANSWER, LEVEL_NAME, ACCESSIBILITY_LEVEL, TEACHER_ID, TOPIC_NAME) 
+                 VALUES (:questionType, :questionBody, :option1, :option2, :option3, :option4, :correctAnswer, :academicLevel, :accessibilityLevel, :id, :selectedTopic)`,
+                {
+                    questionType,
+                    questionBody: (questionBody || '').trim(),
+                    option1: option1.trim(),
+                    option2: option2.trim(),
+                    option3: option3.trim(),
+                    option4: option4.trim(),
+                    correctAnswer: (correctAnswer || '').trim(),
+                    academicLevel,
+                    accessibilityLevel,
+                    id,
+                    selectedTopic
+                }
+            );
+        });
 
-		// let teacherid = await connection.execute(
-		// 	`SELECT teacher_id from teacher where email like :EXISTINGEMAIL`,
-		// 	{ existingemail }
-		// );
-
-		const id = req.session.userId;
-
-		//let id = teacherid.rows[0].TEACHER_ID;
-		//Execute a query to insert a new user
-		await connection.execute(
-			`INSERT INTO Question (TYPE_NAME,question_body,option_1,option_2,option_3,option_4,correct_Answer,LEVEL_NAME,accessibility_Level,teacher_id,TOPIC_NAME) 
-       VALUES (:questionType,:questionBody,:option1,:option2,:option3,:option4,:correctAnswer,:academicLevel,:accessibilityLevel,:ID,:selectedTopic)`,
-			{ questionType, questionBody, option1, option2, option3, option4, correctAnswer, academicLevel, accessibilityLevel, id, selectedTopic }
-		);
-
-		await connection.commit();
-
-		// Close the database connection
-		await connection.close();
-
-		// Respond with a success message
-		res.status(200).json({ message: "Question successfully added" });
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({ error: "Internal server error" });
-	}
+        res.status(200).json({ success: true, message: "Question successfully added" });
+    } catch (error) {
+        console.error("Error creating question:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 router.get("/question-creation", requireLogin, async (req, res) => {
-	try {
-		const connection = await oracledb.getConnection(dbConfig);
-		const topiccollection = await connection.execute(
-			`SELECT * FROM TOPIC`, {}
-		);
+    try {
+        const topiccollection = await db.execute(`SELECT * FROM TOPIC ORDER BY TOPIC_NAME`);
+        const academicLevel = await db.execute(`SELECT LEVEL_NAME FROM ACADEMIC_LEVEL ORDER BY LEVEL_NAME`);
+        const question_type = await db.execute(`SELECT * FROM QUESTION_TYPE`);
 
-		const academicLevel = await connection.execute(
-			`SELECT LEVEL_NAME FROM ACADEMIC_LEVEL`, {}
-		);
-
-		const question_type = await connection.execute(
-			`SELECT * FROM QUESTION_TYPE`, {}
-		);
-
-		await connection.close();
-
-		//console.log(topiccollection.rows);
-		res.render("pages/Teacher/Question_Creation.ejs", { question_types: question_type.rows, topics: topiccollection.rows, academicLevels: academicLevel.rows });
-	}
-	catch (err) {
-		console.log(err);
-	}
+        res.render("pages/Teacher/Question_Creation.ejs", {
+            question_types: question_type.rows || [],
+            topics: topiccollection.rows || [],
+            academicLevels: academicLevel.rows || []
+        });
+    } catch (err) {
+        console.error("Error loading question creation page:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
-
 
 router.get("/create-question-set", requireLogin, async (req, res) => {
-	try {
-		const connection = await oracledb.getConnection(dbConfig);
-		const questions = await connection.execute(
-			`SELECT * FROM Question`, {}
-		);
+    try {
+        const questions = await db.execute(`SELECT * FROM QUESTION WHERE NVL(IS_DELETED, 0) = 0 ORDER BY QUESTION_ID DESC`);
+        const topics = await db.execute(`SELECT * FROM TOPIC ORDER BY TOPIC_NAME`);
 
-		const topics = await connection.execute(
-			`SELECT * FROM Topic`, {}
-		);
-		await connection.close();
-
-		res.render('pages/Teacher/Question_Set_Creation', { questions: questions.rows, topics: topics.rows });
-
-	}
-	catch (err) {
-		console.log(err);
-	}
+        res.render('pages/Teacher/Question_Set_Creation', {
+            questions: questions.rows || [],
+            topics: topics.rows || []
+        });
+    } catch (err) {
+        console.error("Error loading question set creation page:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
-router.get("/search-questions-by-topic", async (req, res) => {
-	try {
-		const selectedTopicsStr = req.query.selectedTopics;
+// JSON Search endpoint for questions by topic
+router.get("/search-questions-by-topic", requireLogin, async (req, res) => {
+    try {
+        const selectedTopicsStr = req.query.selectedTopics || '';
+        const selectedTopics = selectedTopicsStr.split(',').map(s => s.trim()).filter(Boolean);
 
-		// Convert the comma-separated string of topics to an array
-		const selectedTopics = selectedTopicsStr.split(',');
-		console.log(selectedTopics);
-		const connection = await oracledb.getConnection(dbConfig);
+        if (selectedTopics.length === 0) {
+            const allQuestions = await db.execute(`SELECT * FROM QUESTION WHERE NVL(IS_DELETED, 0) = 0 ORDER BY QUESTION_ID DESC`);
+            return res.status(200).json(allQuestions.rows || []);
+        }
 
-		let allQuestions = await connection.execute(
-			`SELECT * FROM Question WHERE TOPIC_NAME = '${selectedTopics[0]}'`, {}
-		);;
+        // Build dynamic IN clause with bind parameters
+        const binds = {};
+        const placeholders = selectedTopics.map((topic, i) => {
+            const key = `topic${i}`;
+            binds[key] = topic;
+            return `:${key}`;
+        }).join(', ');
 
-		for (const topic of selectedTopics) {
-			const questions = await connection.execute(
-				`SELECT * FROM Question WHERE TOPIC_NAME = '${topic}'`, {}
-			);
-			allQuestions.concat(questions.rows);
-		}
+        const sql = `SELECT * FROM QUESTION WHERE NVL(IS_DELETED, 0) = 0 AND TOPIC_NAME IN (${placeholders}) ORDER BY QUESTION_ID DESC`;
+        const result = await db.execute(sql, binds);
 
-		await connection.close();
-		console.log(allQuestions.rows);
-
-		res.render('pages/Teacher/Question_Set_Creation', { questions: allQuestions.rows, topics: [] });
-
-	} catch (err) {
-		console.log(err);
-	}
+        res.status(200).json(result.rows || []);
+    } catch (err) {
+        console.error("Error searching questions by topic:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
-
 
 router.post("/create-question-set", requireLogin, async (req, res) => {
-	try {
-		const data = req.body;
-		const tid = req.session.userId;
-		const questionsetname = data.questionSetName;
-		const questions = data.selectedQuestions;
-		//console.log(data);
+    try {
+        const data = req.body;
+        const tid = req.session.userId;
+        const questionsetname = (data.questionSetName || '').trim();
+        const questions = Array.isArray(data.selectedQuestions) ? data.selectedQuestions : [];
 
-		const connection = await oracledb.getConnection(dbConfig);
-		console.log(data.questionSetName);
-		await connection.execute(
-			`Insert into question_set(question_set_name,teacher_id)
-			values(:questionsetname,:tid)`,
-			{ questionsetname, tid }
-		);
+        if (!questionsetname || questions.length === 0) {
+            return res.status(400).json({ error: "Question set name and questions are required" });
+        }
 
-		const questionsetid = await connection.execute(
-			`Select * from question_set where question_set_name='${questionsetname}' and teacher_id=${tid}`, {}
-		);
+        let totalMarks = 0;
+        questions.forEach(q => {
+            totalMarks += parseInt(q.mark || 1, 10);
+        });
 
-		console.log(questionsetid.rows[0].QUESTION_SET_ID);
+        await db.withTransaction(async (conn) => {
+            // Insert question set with RETURNING clause
+            const qsResult = await conn.execute(
+                `INSERT INTO QUESTION_SET (QUESTION_SET_NAME, TEACHER_ID, NO_OF_QUESTIONS, TOTAL_MARKS)
+                 VALUES (:questionsetname, :tid, :noOfQuestions, :totalMarks)
+                 RETURNING QUESTION_SET_ID INTO :generatedId`,
+                {
+                    questionsetname,
+                    tid,
+                    noOfQuestions: questions.length,
+                    totalMarks,
+                    generatedId: { type: db.oracledb.NUMBER, dir: db.oracledb.BIND_OUT }
+                }
+            );
 
-		const questionsetids = questionsetid.rows[0].QUESTION_SET_ID;
+            const questionSetId = qsResult.outBinds.generatedId[0];
 
+            for (const question of questions) {
+                const qId = parseInt(question.questionId, 10);
+                const mark = parseInt(question.mark || 1, 10);
+                await conn.execute(
+                    `INSERT INTO QUESTION_SET_QUESTION (QUESTION_SET_ID, QUESTION_ID, MARK_OF_QUESTION)
+                     VALUES (:questionSetId, :qId, :mark)`,
+                    { questionSetId, qId, mark }
+                );
+            }
+        });
 
-		questions.forEach(async (question) => {
-			await connection.execute(
-				`Insert into question_set_question(question_set_id,question_id,mark_of_Question)
-                values(${questionsetids},${question.questionId},${question.mark})`,
-				{}
-			);
-		});
-
-
-
-		connection.commit();
-		connection.close();
-		res.status(200).send({ message: "Success" });
-
-	}
-	catch (err) {
-		console.log(err);
-	}
+        res.status(200).json({ success: true, message: "Question set created successfully" });
+    } catch (err) {
+        console.error("Error creating question set:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
-
 
 module.exports = router;

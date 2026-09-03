@@ -1,117 +1,124 @@
 const express = require('express');
 const router = express.Router();
-const oracledb = require("oracledb");
-
-const dbConfig = require('../dbconfig');
-
+const db = require('../db');
 const requireLogin = require('../middleware/requireLogin');
-const dbconfig = require('../dbconfig');
 
-router.get("/modify-topic-subject",requireLogin, async (req, res) => {
-	try {
-		const connection = await oracledb.getConnection(dbConfig);
-		const topiccollection = await connection.execute(
-			`SELECT * FROM TOPIC`, {}
-		);
+router.get("/modify-topic-subject", requireLogin, async (req, res) => {
+    try {
+        const topiccollection = await db.execute(`SELECT * FROM TOPIC ORDER BY TOPIC_NAME`);
+        const subjectscollection = await db.execute(`SELECT * FROM SUBJECT ORDER BY SUBJECT_NAME`);
 
-		const subjectscollection = await connection.execute(
-			`SELECT * FROM SUBJECT`, {}
-		);
-
-		await connection.close();
-
-		console.log(topiccollection.rows);
-		res.render('pages/Teacher/Topic_subject_modify.ejs', { topics: topiccollection.rows, subjects: subjectscollection.rows });
-	}
-	catch (err) {
-		console.log(err);
-	}
+        res.render('pages/Teacher/Topic_subject_modify.ejs', {
+            topics: topiccollection.rows || [],
+            subjects: subjectscollection.rows || []
+        });
+    } catch (err) {
+        console.error("Error fetching topics and subjects:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
-router.post("/create-subject",requireLogin, async (req, res) => {
-	try {
-		const { subjectName, subjectDescription } = req.body;
-		console.log(subjectName);
-		console.log(subjectDescription);
+router.post("/create-subject", requireLogin, async (req, res) => {
+    try {
+        const { subjectName, subjectDescription } = req.body;
+        if (!subjectName) {
+            return res.status(400).json({ error: "Subject name is required" });
+        }
 
+        await db.withTransaction(async (conn) => {
+            await conn.execute(
+                `INSERT INTO SUBJECT (SUBJECT_NAME, SUBJECT_DESCRIPTION) VALUES (:subjectName, :subjectDescription)`,
+                {
+                    subjectName: subjectName.trim(),
+                    subjectDescription: (subjectDescription || '').trim()
+                }
+            );
+        });
 
-		const connection = await oracledb.getConnection(dbconfig);
-		connection.execute(
-			`Insert into SUBJECT(SUBJECT_NAME,SUBJECT_DESCRIPTION) VALUE(:subjectName,:subjectDescription)`,
-			{
-				subjectName,
-                subjectDescription
-			}
-		);
-		connection.commit();
-		connection.close();
-
-		res.status(200).json({ message: "Question successfully added" });
-	}
-	catch (err) {
-		console.log(err);
-	}
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.status(200).json({ message: "Subject successfully added" });
+        }
+        res.redirect('/teacher/modify-topic-subject');
+    } catch (err) {
+        console.error("Error creating subject:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
-router.post("/create-topic",requireLogin, async (req, res) => {
-	try {
-		const { topicName, subjectName, topicDescription } = req.body;
-		console.log(topicName);
-		console.log(subjectName);
-		
-		const connection = await oracledb.getConnection(dbconfig);
-		connection.execute(
-			`Insert into TOPIC(TOPIC_NAME,SUBJECT_NAME,TOPIC_DESCRIPTION) VALUE(:topicName,:subjectName,:topicDescription)`,
-			{
-				topicName,
-				subjectName,
-                topicDescription
-			}
-		);
-		connection.commit();
-		connection.close();
 
-		res.status(200).json({ message: "Question successfully added" });
+router.post("/create-topic", requireLogin, async (req, res) => {
+    try {
+        const { topicName, subjectName, topicDescription } = req.body;
+        if (!topicName || !subjectName) {
+            return res.status(400).json({ error: "Topic and subject names are required" });
+        }
 
-	}
-	catch (err) {
-		console.log(err);
-	}
+        await db.withTransaction(async (conn) => {
+            await conn.execute(
+                `INSERT INTO TOPIC (TOPIC_NAME, SUBJECT_NAME, TOPIC_DESCRIPTION) VALUES (:topicName, :subjectName, :topicDescription)`,
+                {
+                    topicName: topicName.trim(),
+                    subjectName: subjectName.trim(),
+                    topicDescription: (topicDescription || '').trim()
+                }
+            );
+        });
 
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.status(200).json({ message: "Topic successfully added" });
+        }
+        res.redirect('/teacher/modify-topic-subject');
+    } catch (err) {
+        console.error("Error creating topic:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
-router.post("/delete-subject",requireLogin, async (req, res) => {
-	try {
-		const { subjectToDelete } = req.body;
-		console.log(subjectToDelete);
 
-		const connection = await oracledb.getConnection(dbconfig);
-		connection.execute(
-			`DELETE FROM SUBJECT
-			where SUBJECT_NAME like ${subjectToDelete}`,{}
-		);
-		connection.commit();
-		connection.close();
-		res.status(200).json({ message: "Question successfully added" });
-	}
-	catch (err) {
-		console.log(err);
-	}
+router.post("/delete-subject", requireLogin, async (req, res) => {
+    try {
+        const { subjectToDelete } = req.body;
+        if (!subjectToDelete) {
+            return res.status(400).json({ error: "Subject to delete is required" });
+        }
+
+        await db.withTransaction(async (conn) => {
+            await conn.execute(
+                `DELETE FROM SUBJECT WHERE SUBJECT_NAME = :subjectToDelete`,
+                { subjectToDelete: subjectToDelete.trim() }
+            );
+        });
+
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.status(200).json({ message: "Subject successfully deleted" });
+        }
+        res.redirect('/teacher/modify-topic-subject');
+    } catch (err) {
+        console.error("Error deleting subject:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
-router.post("/delete-topic",requireLogin, async (req, res) => {
-	try {
-		const { topicToDelete } = req.body;
-		console.log(topicToDelete);
-		const connection = await oracledb.getConnection(dbconfig);
-		connection.execute(
-			`DELETE FROM TOPIC
-			where topic_name like ${topicName}`,{}
-		);
-		connection.commit();
-		connection.close();
-		res.status(200).json({ message: "Question successfully added" });
-	}
-	catch (err) {
-		console.log(err);
-	}
+
+router.post("/delete-topic", requireLogin, async (req, res) => {
+    try {
+        const { topicToDelete } = req.body;
+        if (!topicToDelete) {
+            return res.status(400).json({ error: "Topic to delete is required" });
+        }
+
+        await db.withTransaction(async (conn) => {
+            await conn.execute(
+                `DELETE FROM TOPIC WHERE TOPIC_NAME = :topicToDelete`,
+                { topicToDelete: topicToDelete.trim() }
+            );
+        });
+
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.status(200).json({ message: "Topic successfully deleted" });
+        }
+        res.redirect('/teacher/modify-topic-subject');
+    } catch (err) {
+        console.error("Error deleting topic:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 module.exports = router;

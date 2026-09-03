@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Oversight Console | Exam Management System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .audit-table th {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        .action-form-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-approve {
+            background: #DCFCE7;
+            color: #15803D;
+        }
+        .btn-approve:hover {
+            background: #BBF7D0;
+        }
+        .btn-reject {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+        .btn-reject:hover {
+            background: #FECACA;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);">
+                    <span class="material-icons">admin_panel_settings</span>
+                </div>
+                <div>
+                    <div class="brand-title">Admin Command Console</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <div class="user-badge">
+                    <div class="user-avatar" style="background: #FEE2E2; color: #DC2626;">A</div>
+                    <span style="font-weight: 600; font-size: 0.9rem;"><%= adminName %></span>
+                    <span class="user-role-pill" style="background: #FEE2E2; color: #DC2626;">Administrator</span>
+                </div>
+                <a href="/teacher" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">arrow_back</span>
+                    <span>Teacher Portal</span>
+                </a>
+                <a href="/teacher/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar Navigation -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Administration</div>
+                <a href="/admin" class="sidebar-item active">
+                    <span class="material-icons">dashboard</span>
+                    <span>Admin Overview</span>
+                </a>
+                <a href="/teacher" class="sidebar-item">
+                    <span class="material-icons">school</span>
+                    <span>Faculty View</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item">
+                    <span class="material-icons">library_books</span>
+                    <span>All Exams</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+
+                <div class="sidebar-heading" style="margin-top: 24px;">Security & Audits</div>
+                <a href="#pending-approvals" class="sidebar-item">
+                    <span class="material-icons">verified_user</span>
+                    <span>Pending Faculty (<%= stats.pendingTeachers %>)</span>
+                </a>
+                <a href="#audit-logs" class="sidebar-item">
+                    <span class="material-icons">history</span>
+                    <span>Activity Logs</span>
+                </a>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="app-main">
+                <div class="page-header">
+                    <h1 class="page-title">Platform Administration & Governance</h1>
+                    <p class="page-subtitle">Oversee faculty verification, inspect database audit logs, and monitor campus assessment activity.</p>
+                </div>
+
+                <!-- Live Metrics Grid -->
+                <div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                    <div class="stat-card" style="border-left: 4px solid #EA580C;">
+                        <div class="stat-header">
+                            <span class="stat-label">Pending Faculty Approvals</span>
+                            <div class="stat-icon" style="background: #FFEDD5; color: #EA580C;">
+                                <span class="material-icons">pending_actions</span>
+                            </div>
+                        </div>
+                        <div class="stat-value"><%= stats.pendingTeachers %></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Awaiting verification</div>
+                    </div>
+
+                    <div class="stat-card" style="border-left: 4px solid #16A34A;">
+                        <div class="stat-header">
+                            <span class="stat-label">Verified Instructors</span>
+                            <div class="stat-icon" style="background: #DCFCE7; color: #16A34A;">
+                                <span class="material-icons">how_to_reg</span>
+                            </div>
+                        </div>
+                        <div class="stat-value"><%= stats.verifiedTeachers %></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Authorized educators</div>
+                    </div>
+
+                    <div class="stat-card" style="border-left: 4px solid var(--primary);">
+                        <div class="stat-header">
+                            <span class="stat-label">Enrolled Students</span>
+                            <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
+                                <span class="material-icons">people</span>
+                            </div>
+                        </div>
+                        <div class="stat-value"><%= stats.students %></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Active candidate scholars</div>
+                    </div>
+
+                    <div class="stat-card" style="border-left: 4px solid #9333EA;">
+                        <div class="stat-header">
+                            <span class="stat-label">Scheduled Exams</span>
+                            <div class="stat-icon" style="background: #F3E8FF; color: #9333EA;">
+                                <span class="material-icons">event_note</span>
+                            </div>
+                        </div>
+                        <div class="stat-value"><%= stats.totalExams %></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Campus assessments</div>
+                    </div>
+                </div>
+
+                <!-- Section: Pending Teacher Approvals -->
+                <section id="pending-approvals" style="margin-top: 32px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                        <div>
+                            <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0;">Pending Faculty Registrations</h2>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 4px 0 0 0;">Authorize new instructors to grant them exam scheduling and grading permissions.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Teacher ID</th>
+                                        <th>Faculty Name</th>
+                                        <th>Email Address</th>
+                                        <th>Registered Date</th>
+                                        <th>Status</th>
+                                        <th style="text-align: right;">Authorization</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (!pendingTeachers || pendingTeachers.length === 0) { %>
+                                        <tr>
+                                            <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                                <span class="material-icons" style="font-size: 40px; color: #16A34A; display: block; margin-bottom: 8px;">check_circle</span>
+                                                All faculty registrations are verified. No pending approvals at this time.
+                                            </td>
+                                        </tr>
+                                    <% } else { %>
+                                        <% pendingTeachers.forEach(t => { %>
+                                            <tr>
+                                                <td><strong>#<%= t.TEACHER_ID %></strong></td>
+                                                <td><strong><%= t.FIRST_NAME %> <%= t.LAST_NAME || '' %></strong></td>
+                                                <td><%= t.EMAIL %></td>
+                                                <td><%= t.REGISTERED_DATE ? new Date(t.REGISTERED_DATE).toLocaleDateString() : 'Recent' %></td>
+                                                <td>
+                                                    <span class="badge" style="background: #FEF3C7; color: #B45309;">Awaiting Approval</span>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <div style="display: inline-flex; gap: 8px;">
+                                                        <form method="POST" action="/admin/teachers/<%= t.TEACHER_ID %>/approve" style="display: inline;">
+                                                            <button type="submit" class="action-form-btn btn-approve">
+                                                                <span class="material-icons" style="font-size: 16px;">check</span>
+                                                                <span>Approve</span>
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" action="/admin/teachers/<%= t.TEACHER_ID %>/reject" onsubmit="return confirm('Reject and remove this registration?');" style="display: inline;">
+                                                            <button type="submit" class="action-form-btn btn-reject">
+                                                                <span class="material-icons" style="font-size: 16px;">close</span>
+                                                                <span>Reject</span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: System Activity & Audit Logs -->
+                <section id="audit-logs" style="margin-top: 36px; margin-bottom: 40px;">
+                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">Oracle Database Audit Trail</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Automated PL/SQL trigger logs capturing question bank modifications and session events.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px;">
+                        <!-- Question Changes Audit -->
+                        <div class="table-card">
+                            <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                                <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                                    <span class="material-icons" style="font-size: 18px; color: var(--primary);">quiz</span>
+                                    <span>Question Bank DML Logs</span>
+                                </div>
+                                <span class="badge" style="background: #F1F5F9; color: var(--text-muted);">Trigger Log</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table audit-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Question ID</th>
+                                            <th>Action</th>
+                                            <th>Faculty Author</th>
+                                            <th>Timestamp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (!questionLogs || questionLogs.length === 0) { %>
+                                            <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">No question logs recorded yet.</td></tr>
+                                        <% } else { %>
+                                            <% questionLogs.forEach(log => { %>
+                                                <tr>
+                                                    <td><strong>Q#<%= log.QUESTION_ID %></strong></td>
+                                                    <td>
+                                                        <% if (log.ACTION === 'INSERT') { %>
+                                                            <span class="badge" style="background: #DCFCE7; color: #16A34A;">INSERT</span>
+                                                        <% } else if (log.ACTION === 'UPDATE') { %>
+                                                            <span class="badge" style="background: #FEF3C7; color: #B45309;">UPDATE</span>
+                                                        <% } else { %>
+                                                            <span class="badge" style="background: #FEE2E2; color: #DC2626;"><%= log.ACTION %></span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td><%= log.FIRST_NAME ? (log.FIRST_NAME + ' ' + (log.LAST_NAME || '')) : ('Teacher #' + log.TEACHER_ID) %></td>
+                                                    <td style="font-size: 0.8rem; color: var(--text-muted);"><%= new Date(log.ACTION_TIME).toLocaleString() %></td>
+                                                </tr>
+                                            <% }); %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Faculty Login Log -->
+                        <div class="table-card">
+                            <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                                <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                                    <span class="material-icons" style="font-size: 18px; color: #16A34A;">login</span>
+                                    <span>Faculty Session Log</span>
+                                </div>
+                                <span class="badge" style="background: #F1F5F9; color: var(--text-muted);">Session Audit</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table audit-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Faculty Member</th>
+                                            <th>Email</th>
+                                            <th>Login Timestamp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (!teacherLogs || teacherLogs.length === 0) { %>
+                                            <tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 24px;">No session logs recorded yet.</td></tr>
+                                        <% } else { %>
+                                            <% teacherLogs.forEach(log => { %>
+                                                <tr>
+                                                    <td><strong><%= log.FIRST_NAME %> <%= log.LAST_NAME || '' %></strong></td>
+                                                    <td><%= log.EMAIL %></td>
+                                                    <td style="font-size: 0.8rem; color: var(--text-muted);"><%= new Date(log.LOGIN_TIME).toLocaleString() %></td>
+                                                </tr>
+                                            <% }); %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

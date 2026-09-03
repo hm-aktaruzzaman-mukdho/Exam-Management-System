@@ -1,221 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiple Forms Submission with MCQs</title>
+    <title>Practice Questions | Student Portal</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #f4f4f4;
-        }
-
-        header {
-            background-color: #3f51b5;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            width: 100%;
-        }
-
-        header .head1 {
-            font-size: 40px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #2ecc71;
-        }
-
-        header .head2 {
-            font-size: 18px;
-        }
-
-        .main-content {
-            display: flex;
-            flex: 1;
-        }
-
-        .left-section {
-            width: 20%; /* Updated width */
-            background-color: #fff;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .left-section select {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .right-section {
-            flex: 1;
-            padding: 20px;
-        }
-
-        form {
+        .practice-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
             margin-bottom: 20px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-fast);
         }
 
-        form p {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .practice-card:hover {
+            border-color: #CBD5E1;
         }
 
-        form label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        button {
-            display: block;
-            margin-bottom: 10px;
-            padding: 10px 20px;
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .practice-opt {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all var(--transition-fast);
+            background: #FFFFFF;
         }
 
-        button:hover {
-            background-color: #27ae60;
+        .practice-opt:hover {
+            background: #F8FAFC;
         }
 
-        #timer {
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 20px;
+        .practice-opt.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            font-weight: 600;
         }
 
-        footer {
-            background-color: #34495e;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-            width: 100%;
+        .practice-opt.correct {
+            border-color: var(--success);
+            background: #DCFCE7;
+            color: #15803D;
+            font-weight: 600;
         }
 
-        footer .foot1 {
-            font-size: 14px;
+        .practice-opt.incorrect {
+            border-color: var(--danger);
+            background: #FEE2E2;
+            color: #991B1B;
+            font-weight: 600;
+        }
+
+        .solution-box {
+            display: none;
+            margin-top: 14px;
+            padding: 14px 18px;
+            background: #F8FAFC;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            font-size: 0.92rem;
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="head1">EXAM MANAGEMENT SYSTEM</div>
-        <div class="head2">An exam management system for students and teachers of all kinds</div>
-    </header>
 
-    <div class="main-content">
-        <div class="left-section">
-            <select id="topicSelect">
-                <option value="">Select Topic</option>
-                <!-- Injected options will be placed here -->
-            </select>
-            <select id="subjectSelect">
-                <option value="">Select Subject</option>
-                <!-- Injected options will be placed here -->
-            </select>
-            <button id="fetchQuestionsButton" onclick="fetchQuestions()">Fetch Questions</button>
-            <button id="submitBtn">Submit All Forms</button>
-            <p><a href="/student" style="color: #3f51b5; text-decoration: none;">Back to Student Page</a></p>
-        </div>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon">
+                    <span class="material-icons">school</span>
+                </div>
+                <div class="brand-title">Student Portal</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/student" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
 
-        <div class="right-section">
-            <div id="timer">02:00</div>
-            <% questioncollections.forEach( question =>{ %>
-            <form id="form1">
-                <p>QUESTION:<%=question.QUESTION_BODY%></p>
-                <label for="q1_option1"><input type="radio" id="q1_option1" name="<%=question.QUESTION_ID %>"
-                        value="<%=question.OPTION_1 %>"> <%=question.OPTION_1 %></label>
-                <label for="q1_option2"><input type="radio" id="q1_option2" name="<%=question.QUESTION_ID %>"
-                        value="<%=question.OPTION_2 %>"> <%=question.OPTION_2 %></label>
-                <label for="q1_option3"><input type="radio" id="q1_option3" name="<%=question.QUESTION_ID %>"
-                        value="<%=question.OPTION_3 %>"> <%=question.OPTION_3 %></label>
-                <label for="q1_option4"><input type="radio" id="q1_option4" name="<%=question.QUESTION_ID %>"
-                        value="<%=question.OPTION_4 %>"> <%=question.OPTION_4 %></label>
-            </form>
-            <% }) %>
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Navigation</div>
+                <a href="/student" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/exams" class="sidebar-item">
+                    <span class="material-icons">assignment_turned_in</span>
+                    <span>Exams</span>
+                </a>
+                <a href="/student/create-exam" class="sidebar-item">
+                    <span class="material-icons">add_task</span>
+                    <span>Practice Exam</span>
+                </a>
+                <a href="/student/questions" class="sidebar-item active">
+                    <span class="material-icons">menu_book</span>
+                    <span>Question Practice</span>
+                </a>
+                <a href="/student/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/student/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main" style="max-width: 900px; margin: 0 auto; width: 100%;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: var(--primary);">menu_book</span>
+                            Interactive Question Practice
+                        </h1>
+                        <p class="page-subtitle">Test your skills without time limits. Pick an answer and check the solution instantly.</p>
+                    </div>
+                </div>
+
+                <% (questioncollections || []).forEach((q, idx) => { %>
+                    <div class="practice-card" id="qcard-<%= q.QUESTION_ID %>" data-correct="<%= q.CORRECT_ANSWER %>">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+                                Question <%= idx + 1 %>
+                            </span>
+                            <span class="badge" style="background: #F1F5F9; color: var(--text-muted);">
+                                <%= q.TYPE_NAME || 'MCQ' %>
+                            </span>
+                        </div>
+
+                        <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 16px;">
+                            <%= q.QUESTION_BODY %>
+                        </div>
+
+                        <div class="options-container">
+                            <% [q.OPTION_1, q.OPTION_2, q.OPTION_3, q.OPTION_4].forEach(opt => { %>
+                                <% if (opt && opt.trim()) { %>
+                                    <div class="practice-opt" onclick="selectPracticeOption(this, '<%= q.QUESTION_ID %>')">
+                                        <input type="radio" name="opt_<%= q.QUESTION_ID %>" value="<%= opt %>" style="accent-color: var(--primary);">
+                                        <span><%= opt %></span>
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 14px;">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="checkAnswer('<%= q.QUESTION_ID %>')">
+                                <span class="material-icons" style="font-size: 16px;">check</span>
+                                <span>Verify Answer</span>
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="revealAnswer('<%= q.QUESTION_ID %>')">
+                                <span class="material-icons" style="font-size: 16px;">visibility</span>
+                                <span>Show Solution</span>
+                            </button>
+                        </div>
+
+                        <div class="solution-box" id="sol-<%= q.QUESTION_ID %>">
+                            <strong>Correct Solution:</strong> <span class="sol-text" style="color: #15803D; font-weight: 600;"><%= q.CORRECT_ANSWER %></span>
+                        </div>
+                    </div>
+                <% }); %>
+            </main>
         </div>
     </div>
 
-    <footer>
-        <div class="foot1">&copy; Exam Managment System</div>
-    </footer>
-
     <script>
-        let timerDisplay = document.getElementById("timer");
-        let totalTime = 10; // 2 minutes in seconds
-        let manualSubmit = false;
-
-
-        function fetchQuestions() {
-            // Make an asynchronous request to fetch questions from the server
-            window.location.href = '/student/get-all-questions';
+        function selectPracticeOption(el, qid) {
+            const card = document.getElementById('qcard-' + qid);
+            card.querySelectorAll('.practice-opt').forEach(opt => {
+                opt.classList.remove('selected');
+                const radio = opt.querySelector('input[type="radio"]');
+                if (radio) radio.checked = false;
+            });
+            el.classList.add('selected');
+            const radio = el.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
         }
 
-        document.getElementById('submitBtn').addEventListener('click', function () {
-            if (totalTime <= 0) {
-                alert("Time is up!\n You can not submit anything")
+        function checkAnswer(qid) {
+            const card = document.getElementById('qcard-' + qid);
+            const correct = card.getAttribute('data-correct');
+            const selectedOpt = card.querySelector('.practice-opt.selected');
+
+            if (!selectedOpt) {
+                alert('Please select an option first!');
+                return;
             }
-            else {
-                manualSubmit = true;
-                submitAllForms();
-            }
-        });
 
-        function submitAllForms() {
-            var formDataArray = [];
+            const chosenVal = selectedOpt.querySelector('input').value;
+            const solBox = document.getElementById('sol-' + qid);
+            solBox.style.display = 'block';
 
-            var forms = document.querySelectorAll('form');
-
-            forms.forEach(function (form) {
-                var formData = {};
-                var inputs = form.querySelectorAll('input[type="radio"]:checked');
-
-                inputs.forEach(function (input) {
-                    formData["QURSTION_ID"] = input.name;
-                    formData["GIVEN_ANSWER"] = input.value;
-                });
-
-                formDataArray.push(formData);
+            card.querySelectorAll('.practice-opt').forEach(opt => {
+                const val = opt.querySelector('input').value;
+                if (val === correct) {
+                    opt.classList.add('correct');
+                } else if (opt === selectedOpt && val !== correct) {
+                    opt.classList.add('incorrect');
+                }
             });
+        }
 
-            var jsonData = JSON.stringify(formDataArray);
-
-            // Send jsonData to the server
-            fetch('/student/submit-exam-answer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonData
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Form data submitted successfully!');
-                    } else {
-                        console.error('Failed to submit form data');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+        function revealAnswer(qid) {
+            const solBox = document.getElementById('sol-' + qid);
+            solBox.style.display = 'block';
+            const card = document.getElementById('qcard-' + qid);
+            const correct = card.getAttribute('data-correct');
+            card.querySelectorAll('.practice-opt').forEach(opt => {
+                if (opt.querySelector('input').value === correct) {
+                    opt.classList.add('correct');
+                }
+            });
         }
     </script>
 </body>

@@ -4,103 +4,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <title>Exam Management System | Next-Gen Academic Assessment</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            background-image: url('https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99'); /* Replace with your desired background image URL */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh;
+        .hero-section {
+            padding: 80px 24px 60px;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: #EEF2FF;
+            color: #4F46E5;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            border: 1px solid #C7D2FE;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #0F172A 0%, #334155 50%, #4F46E5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: #475569;
+            max-width: 680px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .portal-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 36px 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+
+        .portal-card.teacher::before {
+            background: var(--secondary-gradient);
+        }
+
+        .portal-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
+            border-color: #CBD5E1;
+        }
+
+        .portal-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: #FFF;
+            font-size: 32px;
+        }
+
+        .portal-student-icon { background: var(--primary-gradient); }
+        .portal-teacher-icon { background: var(--secondary-gradient); }
+
+        .portal-title {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .portal-desc {
+            color: #64748B;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        .portal-actions {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            gap: 10px;
         }
 
-        header {
-            background-color: rgba(52, 73, 94, 0.8);
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
+        .features-section {
+            background: #FFFFFF;
+            border-top: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 70px 24px;
         }
 
-        nav {
-            display: flex;
-            justify-content: center;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 20px;
-            font-size: 1.2rem;
-            transition: color 0.3s ease;
-        }
-
-        nav a:hover {
-            color: #f39c12;
-        }
-
-        footer {
-            background-color: rgba(52, 73, 94, 0.8);
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        .container {
-            max-width: 1200px;
+        .features-container {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+            margin-top: 40px;
+        }
+
+        .feature-box {
+            padding: 24px;
+            border-radius: 14px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            transition: all 0.2s ease;
+        }
+
+        .feature-box:hover {
+            background: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-color: #CBD5E1;
+        }
+
+        .feature-icon-wrapper {
+            width: 44px;
+            height: 44px;
             border-radius: 10px;
+            background: #EEF2FF;
+            color: #4F46E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
         }
 
-        .container h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .container p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .container h1 {
-                font-size: 2.5rem;
-            }
-
-            .container p {
-                font-size: 1rem;
-            }
+        .footer {
+            padding: 40px 24px;
+            text-align: center;
+            color: #64748B;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <h1>Exam Management System</h1>
-        <nav>
-            <a href="/student/login">Student Login</a>
-            <a href="/teacher/login">Teacher Login</a>
-        </nav>
+    <header class="app-navbar">
+        <div class="brand-wrapper">
+            <div class="brand-icon">
+                <span class="material-icons">school</span>
+            </div>
+            <span class="brand-title">Exam Management System</span>
+        </div>
+        <div class="nav-actions">
+            <a href="/student/login" class="btn btn-outline btn-sm">Student Sign In</a>
+            <a href="/teacher/login" class="btn btn-primary btn-sm">Teacher Portal</a>
+        </div>
     </header>
 
-    <div class="container">
-        <h1>Welcome to the Exam Management System</h1>
-        <p>This platform helps students and teachers manage exams efficiently.</p>
-    </div>
+    <main>
+        <section class="hero-section">
+            <div class="hero-badge">
+                <span class="material-icons" style="font-size: 16px;">verified</span>
+                Enterprise Oracle Database Assessment Platform
+            </div>
+            <h1 class="hero-title">Academic Testing Reimagined for Excellence</h1>
+            <p class="hero-desc">A unified platform for students and educators to conduct real-time evaluations, automate grading, and cultivate academic mastery with intuitive tools.</p>
+        </section>
 
-    <footer>
-        <p>&copy; 2024 Exam Management System. All rights reserved.</p>
+        <section class="portal-grid">
+            <div class="portal-card">
+                <div class="portal-icon portal-student-icon">
+                    <span class="material-icons">person</span>
+                </div>
+                <h2 class="portal-title">Student Portal</h2>
+                <p class="portal-desc">Take scheduled exams, practice topic-wise questions, submit homework assignments, and track performance results.</p>
+                <div class="portal-actions">
+                    <a href="/student/login" class="btn btn-primary">Sign In as Student</a>
+                    <a href="/student/signup" class="btn btn-secondary">Create Student Account</a>
+                </div>
+            </div>
+
+            <div class="portal-card teacher">
+                <div class="portal-icon portal-teacher-icon">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <h2 class="portal-title">Teacher Portal</h2>
+                <p class="portal-desc">Design question sets, schedule automated exams, manage subject topics, and review submissions with feedback.</p>
+                <div class="portal-actions">
+                    <a href="/teacher/login" class="btn btn-primary" style="background: #0EA5E9;">Sign In as Teacher</a>
+                    <a href="/teacher/signup" class="btn btn-secondary">Register as Faculty</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="features-container">
+                <div style="text-align: center;">
+                    <h2>Everything needed for academic evaluation</h2>
+                    <p style="color: #64748B; margin-top: 8px;">Designed for rigorous university environments and seamless accessibility.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <span class="material-icons">timer</span>
+                        </div>
+                        <h3>Timed Exams</h3>
+                        <p style="color: #64748B; font-size: 0.9rem; margin-top: 8px;">Precision live countdowns, auto-locking, and zero race conditions on submission.</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <span class="material-icons">auto_stories</span>
+                        </div>
+                        <h3>Dynamic Question Bank</h3>
+                        <p style="color: #64748B; font-size: 0.9rem; margin-top: 8px;">Filter by subject, topic, and difficulty to generate tailored exam sets in seconds.</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <span class="material-icons">assignment_turned_in</span>
+                        </div>
+                        <h3>Assignment Management</h3>
+                        <p style="color: #64748B; font-size: 0.9rem; margin-top: 8px;">Easy file uploads, deadline tracking, and integrated teacher grading with feedback.</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <span class="material-icons">analytics</span>
+                        </div>
+                        <h3>Instant Analytics</h3>
+                        <p style="color: #64748B; font-size: 0.9rem; margin-top: 8px;">Detailed breakdown of questions answered, accuracy rate, and faculty reviews.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Exam Management System. High-Performance Oracle Database Sessional Architecture.</p>
     </footer>
 
 </body>

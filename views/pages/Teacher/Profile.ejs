@@ -4,192 +4,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
-    <!-- Material Icons -->
+    <title>Faculty Profile | Exam Management System</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+        .profile-container {
+            max-width: 760px;
+            margin: 0 auto;
         }
 
-        #header {
-            background-color: #004985;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .profile-avatar-hero {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
         }
 
-        h2 {
-            margin-top: 20px;
-            text-align: center;
+        .profile-avatar-large {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--secondary-gradient);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
         }
 
-        .container {
-            margin-top: 20px;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 40px;
-            background-color: #daf7fd;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        .info-pill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
         }
 
-        label {
-            font-weight: bold;
+        .info-pill {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
         }
 
-        input[type="text"],
-        input[type="password"] {
-            width: calc(100% - 12px);
-            padding: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
+        .info-pill-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
-        .readonly {
-            background-color: #f9f9f9;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .error-message {
-            color: red;
-            margin-top: 5px;
+        .info-pill-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 2px;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <div id="header">
-        <h2>Edit Profile</h2>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: var(--secondary-gradient);">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <div class="brand-title">Teacher Command Center</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/teacher" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Faculty Tools</div>
+                <a href="/teacher" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item">
+                    <span class="material-icons">library_books</span>
+                    <span>View Exams</span>
+                </a>
+                <a href="/teacher/create-exam" class="sidebar-item">
+                    <span class="material-icons">playlist_add</span>
+                    <span>Create Exam</span>
+                </a>
+                <a href="/teacher/question-creation" class="sidebar-item">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>Add Question</span>
+                </a>
+                <a href="/teacher/create-question-set" class="sidebar-item">
+                    <span class="material-icons">rule</span>
+                    <span>Question Sets</span>
+                </a>
+                <a href="/teacher/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/teacher/create-assignment" class="sidebar-item">
+                    <span class="material-icons">add_to_queue</span>
+                    <span>Create Assignment</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+                <a href="/teacher/profile" class="sidebar-item active">
+                    <span class="material-icons">person</span>
+                    <span>Faculty Profile</span>
+                </a>
+            </nav>
+
+            <main class="app-main">
+                <div class="profile-container">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">
+                                <span class="material-icons" style="font-size: 32px; color: #0EA5E9;">manage_accounts</span>
+                                Faculty Profile & Credentials
+                            </h1>
+                            <p class="page-subtitle">Manage faculty details, verification status, and security keys</p>
+                        </div>
+                    </div>
+
+                    <% const t = (user && user.length > 0) ? user[0] : {}; %>
+
+                    <div class="card">
+                        <div class="profile-avatar-hero">
+                            <div class="profile-avatar-large">
+                                <%= (t.FIRST_NAME || 'T').charAt(0).toUpperCase() %>
+                            </div>
+                            <div>
+                                <h2 style="font-size: 1.5rem;"><%= t.FIRST_NAME %> <%= t.LAST_NAME %></h2>
+                                <p style="color: var(--text-muted); font-size: 0.92rem;"><%= t.EMAIL %></p>
+                                <span class="badge" style="background: #DCFCE7; color: #15803D; margin-top: 6px; display: inline-block;">
+                                    Faculty Instructor
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Readonly Info Pills -->
+                        <div class="info-pill-grid">
+                            <div class="info-pill">
+                                <div class="info-pill-label">Instructor ID</div>
+                                <div class="info-pill-value">#<%= t.TEACHER_ID %></div>
+                            </div>
+                            <div class="info-pill">
+                                <div class="info-pill-label">Verification Status</div>
+                                <div class="info-pill-value" style="color: <%= t.APPROVAL_STATUS === 1 ? '#15803D' : '#D97706' %>;">
+                                    <%= t.APPROVAL_STATUS === 1 ? 'Approved Instructor' : 'Pending Verification' %>
+                                </div>
+                            </div>
+                            <div class="info-pill">
+                                <div class="info-pill-label">Endorsed By</div>
+                                <div class="info-pill-value"><%= t.APPROVED_BY || 'Super Admin' %></div>
+                            </div>
+                            <div class="info-pill">
+                                <div class="info-pill-label">Joined Faculty</div>
+                                <div class="info-pill-value"><%= t.REGISTERED_DATE ? new Date(t.REGISTERED_DATE).toLocaleDateString() : 'N/A' %></div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Form -->
+                        <h2 style="font-size: 1.2rem; margin-bottom: 16px;">Update Name & Credentials</h2>
+                        <form id="editForm" onsubmit="handleTeacherProfileUpdate(event)">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label" for="firstName">First Name</label>
+                                    <input type="text" id="firstName" name="firstName" class="form-control" value="<%= t.FIRST_NAME %>" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="lastName">Last Name</label>
+                                    <input type="text" id="lastName" name="lastName" class="form-control" value="<%= t.LAST_NAME %>" required>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label" for="password">New Password</label>
+                                    <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to keep unchanged">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Repeat new password">
+                                    <div id="passwordMismatchError" style="display: none; color: #DC2626; font-size: 0.8rem; margin-top: 4px;">Passwords do not match</div>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="saveBtn" class="btn btn-primary" style="margin-top: 8px; background: #0EA5E9;">
+                                <span class="material-icons" style="font-size: 18px;">save</span>
+                                <span>Save Changes</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <!-- Content -->
-    <div class="container">
-        <form id="editForm">
-            <div class="input-field">
-                <input type="text" id="firstName" name="firstName" value="<%= user[0].FIRST_NAME %>" required>
-                <label for="firstName"><strong>First Name</strong></label>
-            </div>
-
-            <div class="input-field">
-                <input type="text" id="lastName" name="lastName" value="<%= user[0].LAST_NAME %>" required>
-                <label for="lastName"><strong>Last Name</strong></label>
-            </div>
-
-            <div class="input-field">
-                <input type="password" id="password" name="password" required>
-                <label for="password"><strong>New Password</strong></label>
-            </div>
-
-            <div class="input-field">
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-                <label for="confirmPassword"><strong>Confirm Password</strong></label>
-                <span id="passwordError" class="error-message"></span>
-            </div>
-
-            <div class="readonly"><strong>Teacher ID:</strong> <%= user[0].TEACHER_ID %></div>
-            <div class="readonly"><strong>Email: </strong><%= user[0].EMAIL %></div>
-            <div class="readonly"><strong>Approval Status: </strong><%= user[0].APPROVAL_STATUS === 1 ? 'Approved' : 'Not Approved' %></div>
-            <div class="readonly"><strong>Approved By: </strong><%= user[0].APPROVED_BY %></div>
-            <div class="readonly"><strong>Registered Date:</strong> <%= user[0].REGISTERED_DATE %></div>
-
-            <button type="submit" id="saveChangesButton">Save Changes</button>
-        </form>
-    </div>
-
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Materialize Form Inputs
-            M.updateTextFields();
+        async function handleTeacherProfileUpdate(e) {
+            e.preventDefault();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('passwordMismatchError');
 
-            // Handle Form Submission
-            document.getElementById('editForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-                const formData = new FormData(this);
-                const newdata = {
-                    firstName: formData.get('firstName'),
-                    lastName: formData.get('lastName'),
-                    password: formData.get('password')
+            errorDiv.style.display = 'none';
+
+            if (password && password !== confirmPassword) {
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Saving...';
+
+            try {
+                const newdata = { firstName, lastName };
+                if (password) {
+                    newdata.password = password;
                 }
 
-                console.log(newdata);
-
-                // Check if passwords match
-                const password = formData.get('password');
-                const confirmPassword = formData.get('confirmPassword');
-                if (password !== confirmPassword) {
-                    document.getElementById('passwordError').textContent = "Passwords do not match";
-                    return;
-                }
-
-                // If passwords match, send data to server
-                fetch("/teacher/update-profile", {
+                const res = await fetch('/teacher/update-profile', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({credentials:newdata})
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            // Optionally, handle successful response
-                            console.log('Profile updated successfully');
-                        } else {
-                            // Optionally, handle error response
-                            console.error('Failed to update profile');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credentials: newdata })
+                });
 
-            // Check if passwords match on input change
-            document.getElementById('confirmPassword').addEventListener('input', function () {
-                const password = document.getElementById('password').value;
-                const confirmPassword = this.value;
-                const passwordError = document.getElementById('passwordError');
-
-                if (password !== confirmPassword) {
-                    passwordError.textContent = "Passwords do not match";
-                    document.getElementById('saveChangesButton').disabled = true;
-                } 
-                else {
-                    passwordError.textContent = "";
-                    document.getElementById('saveChangesButton').disabled = false;
+                if (res.ok) {
+                    alert('Faculty profile updated successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Failed to update profile.');
                 }
-            });
-        });
+            } catch (err) {
+                console.error(err);
+                alert('Network error updating profile.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Save Changes</span>';
+            }
+        }
     </script>
-
 </body>
 
 </html>

@@ -1,73 +1,50 @@
 const express = require('express');
 const router = express.Router();
-const oracledb = require("oracledb");
-
-const dbConfig = require('../dbconfig');
-
+const db = require('../db');
 const requireLogin = require('../middleware/requireLogin');
 
-
-router.get("/get-all-topics",requireLogin, async (req, res) => {
-	try {
-		// Connect to the Oracle database
-		const connection = await oracledb.getConnection(dbConfig);
-		const result = await connection.execute(
-			`SELECT topic_name,subject_name,topic_description FROM topic`,
-			{},
-			{ outFormat: oracledb.OUT_FORMAT_OBJECT }
-		);
-
-		// Closing the connection
-		await connection.close();
-		console.log(result);
-
-		res.status(200).json(result.rows);
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({ error: "Internal server error" });
-	}
+router.get("/get-all-topics", requireLogin, async (req, res) => {
+    try {
+        const result = await db.execute(
+            `SELECT TOPIC_NAME, SUBJECT_NAME, TOPIC_DESCRIPTION FROM TOPIC ORDER BY TOPIC_NAME`
+        );
+        res.status(200).json(result.rows || []);
+    } catch (error) {
+        console.error("Error fetching all topics:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
-router.post("/search-topics",requireLogin, async (req, res) => {
-	try {
-		// Connect to the Oracle database
-		const { searchTerm } = req.body;
-		console.log(searchTerm);
-		const connection = await oracledb.getConnection(dbConfig);
-		const result = await connection.execute(
-			`SELECT topic_name,subject_name,topic_description FROM topic WHERE lower(topic_name) LIKE lower(:SEARCHTERM)`,
-			{ searchTerm },
-			{ outFormat: oracledb.OUT_FORMAT_OBJECT }
-		);
+router.post("/search-topics", requireLogin, async (req, res) => {
+    try {
+        const { searchTerm } = req.body;
+        const term = `%${(searchTerm || '').trim().toLowerCase()}%`;
 
-		// Closing the connection
-		await connection.close();
-		console.log(result);
-		res.status(200).json(result.rows);
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({ error: "Internal server error" });
-	}
+        const result = await db.execute(
+            `SELECT TOPIC_NAME, SUBJECT_NAME, TOPIC_DESCRIPTION 
+             FROM TOPIC 
+             WHERE LOWER(TOPIC_NAME) LIKE :term OR LOWER(TOPIC_DESCRIPTION) LIKE :term
+             ORDER BY TOPIC_NAME`,
+            { term }
+        );
+
+        res.status(200).json(result.rows || []);
+    } catch (error) {
+        console.error("Error searching topics:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
-router.get("/get-subjects",requireLogin, async (req, res) => {
-	try {
-		// Connect to the Oracle database
-		const connection = await oracledb.getConnection(dbConfig);
-		const result = await connection.execute(
-			`SELECT subject_name FROM topic`,
-			{},
-			{ outFormat: oracledb.OUT_FORMAT_OBJECT }
-		);
-
-		// Closing the connection
-		await connection.close();
-		console.log(result);
-		res.status(200).json(result.rows);
-	} catch (err) {
-		console.log(err);
-	}
+router.get("/get-subjects", requireLogin, async (req, res) => {
+    try {
+        const result = await db.execute(
+            `SELECT SUBJECT_NAME, SUBJECT_DESCRIPTION FROM SUBJECT ORDER BY SUBJECT_NAME`
+        );
+        res.status(200).json(result.rows || []);
+    } catch (err) {
+        console.error("Error fetching subjects:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
-
 
 module.exports = router;

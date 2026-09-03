@@ -4,308 +4,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Page</title>
+    <title>Student Dashboard | Exam Management System</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .topic-chip {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-fast);
             display: flex;
             flex-direction: column;
-            align-items: stretch;
-            height: 100vh;
+            justify-content: space-between;
         }
 
-        #navbar {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
+        .topic-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: #C7D2FE;
         }
 
-        #main-container {
+        .topic-header {
             display: flex;
-            align-items: stretch;
-            height: calc(100% - 60px);
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
         }
 
-        #options-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            padding: 20px;
-            background-color: #fff;
-            border-right: 1px solid #e0e0e0;
-            width: 15%;
-            overflow-y: auto;
-            /* Added */
-        }
-
-        .option {
-            padding: 12px;
-            margin: 10px 0;
-            cursor: pointer;
-            border-radius: 4px;
-            width: 100%;
-            text-align: center;
-            background-color: #fff;
-            color: #333;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .topic-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            /* Prevents long text from breaking layout */
-            white-space: nowrap;
-            /* Prevents text from wrapping */
-            text-overflow: ellipsis;
-            /* Display ellipsis for overflow text */
+            font-size: 20px;
         }
 
-        .option:hover {
-            background-color: #f0f0f0;
+        .topic-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
         }
 
-        .material-icons {
-            margin-right: 8px;
-        }
-
-        #content-container {
-            padding: 20px;
-            flex-grow: 1;
-        }
-
-        #search-container {
-            display: none;
-            flex-direction: row;
-            align-items: center;
-            padding: 10px;
-            background-color: #fff;
-        }
-
-        #search-field {
-            padding: 5px;
-            margin-right: 5px;
-        }
-
-        #search-button {
-            padding: 8px;
-            cursor: pointer;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
+        .topic-subject {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #F1F5F9;
+            padding: 2px 8px;
             border-radius: 4px;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 480px;
+            margin-bottom: 24px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .search-input {
+            padding-left: 44px;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="navbar">
-        <h1>Student Home Page</h1>
-    </div>
-
-    <div id="main-container">
-
-        <div id="options-container">
-            <div class="option" onclick="viewTopics()">
-                <span class="material-icons">menu_book</span>
-                <span>View Topics</span>
-            </div>
-            <div class="option" onclick="toggleSearchContainer()">
-                <span class="material-icons">search</span>
-                <span>Search Topics</span>
-            </div>
-            <div class="option" onclick="viewSubjects()">
-                <span class="material-icons">subject</span>
-                <span>View Subjects</span>
-            </div>
-            <div class="option" onclick="viewPracticeQuestions()">
-                <span class="material-icons">question_answer</span>
-                <span>Practice Questions</span>
-            </div>
-            <div class="option" onclick="createExams()">
-                <span class="material-icons">assignment_turned_in</span>
-                <span>Create Exams</span>
-            </div>
-            <div class="option" onclick="viewExams()">
-                <span class="material-icons">assignment_turned_in</span>
-                <span>View Exams</span>
-            </div>
-            <div class="option" onclick="viewAssignments()">
-                <span class="material-icons">assignment</span>
-                <span>View Assignments</span>
-            </div>
-            <div class="option" onclick="viewProfile()">
-                <span class="material-icons">person</span>
-                <span>Profile</span>
-            </div>
-        </div>
-
-        <div id="content-container">
-            <!-- Content will be dynamically loaded here -->
-            <div>
-                <h1>Topics</h1>
-                <div>
-                    <% topics.forEach(function(topic) { %>
-                        <div>
-                            <%= topic.TOPIC_NAME %>
-                        </div>
-                        <% }); %>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon">
+                    <span class="material-icons">school</span>
                 </div>
-
-                <h1>Subjects</h1>
                 <div>
-                    <% subjects.forEach(function(subject) { %>
-                        <div>
-                            <%= subject.SUBJECT_NAME %>
-                        </div>
-                        <% }); %>
+                    <div class="brand-title">Exam Management System</div>
                 </div>
             </div>
+            <div class="nav-actions">
+                <div class="user-badge">
+                    <div class="user-avatar">S</div>
+                    <span style="font-weight: 600; font-size: 0.9rem;">Student Portal</span>
+                    <span class="user-role-pill">Student</span>
+                </div>
+                <a href="/student/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar Navigation -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Navigation</div>
+                <a href="/student" class="sidebar-item active">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/exams" class="sidebar-item">
+                    <span class="material-icons">assignment_turned_in</span>
+                    <span>Exams</span>
+                </a>
+                <a href="/student/create-exam" class="sidebar-item">
+                    <span class="material-icons">add_task</span>
+                    <span>Practice Exam</span>
+                </a>
+                <a href="/student/questions" class="sidebar-item">
+                    <span class="material-icons">menu_book</span>
+                    <span>Question Practice</span>
+                </a>
+                <a href="/student/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/student/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: var(--primary);">waving_hand</span>
+                            Welcome Back, Student!
+                        </h1>
+                        <p class="page-subtitle">Track your assessments, practice test topics, and view exam results</p>
+                    </div>
+                </div>
+
+                <!-- Overview Stat Cards -->
+                <div class="grid-stats">
+                    <div class="stat-card" onclick="window.location.href='/student/exams'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-primary">
+                            <span class="material-icons">assignment_turned_in</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.completedExams) || 0 %></div>
+                            <div class="stat-label">Exams Completed (<%= (typeof stats !== 'undefined' && stats.avgScore) || 0 %> Avg Pts)</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/student/questions'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-success">
+                            <span class="material-icons">quiz</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.practiceQuestions) || 0 %></div>
+                            <div class="stat-label">Practice Questions Available</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/student/assignments'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-warning">
+                            <span class="material-icons">assignment</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.pendingAssignments) || 0 %></div>
+                            <div class="stat-label">Pending Homeworks Due</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" onclick="window.location.href='/student/exams'" style="cursor: pointer;">
+                        <div class="stat-icon-wrapper stat-icon-secondary">
+                            <span class="material-icons">event</span>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.upcomingExams) || 0 %></div>
+                            <div class="stat-label">Upcoming Scheduled Tests</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topic Mastery & Weakness Insights -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h2 class="card-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-icons" style="color: var(--primary);">insights</span>
+                                <span>Topic Mastery & Weakness Insights</span>
+                            </h2>
+                            <p style="color: var(--text-muted); font-size: 0.88rem;">Personalized accuracy breakdown derived from your completed assessment submissions</p>
+                        </div>
+                        <a href="/student/questions" class="btn btn-outline btn-sm">
+                            <span class="material-icons" style="font-size: 16px;">fitness_center</span>
+                            <span>Practice Bank</span>
+                        </a>
+                    </div>
+
+                    <% if (typeof topicMastery !== 'undefined' && topicMastery.length > 0) { %>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                            <% topicMastery.forEach(tm => { %>
+                                <% 
+                                    const pct = Number(tm.ACCURACY_PERCENT || 0);
+                                    let statusColor = '#DC2626';
+                                    let statusBg = '#FEE2E2';
+                                    let statusLabel = 'Needs Improvement';
+                                    if (pct >= 70) {
+                                        statusColor = '#16A34A';
+                                        statusBg = '#DCFCE7';
+                                        statusLabel = 'Mastered';
+                                    } else if (pct >= 50) {
+                                        statusColor = '#D97706';
+                                        statusBg = '#FEF3C7';
+                                        statusLabel = 'Review Needed';
+                                    }
+                                %>
+                                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <span style="font-weight: 700; font-size: 0.95rem;"><%= tm.TOPIC_NAME %></span>
+                                            <span class="badge" style="background: <%= statusBg %>; color: <%= statusColor %>; font-size: 0.72rem;">
+                                                <%= statusLabel %>
+                                            </span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">
+                                            <span>Score: <%= tm.CORRECT_COUNT %> / <%= tm.TOTAL_ATTEMPTED %> correct</span>
+                                            <span style="font-weight: 700; color: <%= statusColor %>;"><%= pct %>%</span>
+                                        </div>
+                                        <div style="background: #E2E8F0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+                                            <div style="background: <%= statusColor %>; height: 100%; width: <%= Math.min(100, Math.max(5, pct)) %>%; border-radius: 4px;"></div>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        <a href="/student/questions" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 4px 8px;">
+                                            <span>Targeted Drill</span>
+                                            <span class="material-icons" style="font-size: 14px;">arrow_forward</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div style="padding: 24px; text-align: center; background: #F8FAFC; border-radius: 8px; border: 1px dashed var(--border-color);">
+                            <span class="material-icons" style="font-size: 36px; color: var(--text-light); margin-bottom: 6px;">auto_graph</span>
+                            <div style="font-weight: 600; color: var(--text-main); font-size: 0.9rem;">No topic history available yet</div>
+                            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px;">Complete your first scheduled exam or practice exam to generate real-time topic mastery insights!</div>
+                        </div>
+                    <% } %>
+                </div>
+
+                <!-- Topics & Course Content Explorer -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                        <div>
+                            <h2 class="card-title" style="margin-bottom: 4px;">Curriculum & Topics</h2>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Browse syllabus topics and study material</p>
+                        </div>
+                        <div class="search-wrapper" style="margin-bottom: 0;">
+                            <span class="material-icons search-icon">search</span>
+                            <input id="topicSearchInput" type="text" class="form-control search-input" placeholder="Search topics or subjects..." oninput="filterTopics()">
+                        </div>
+                    </div>
+
+                    <div id="topicsContainer" class="topic-grid">
+                        <% if (topics && topics.length > 0) { %>
+                            <% topics.forEach(topic => { %>
+                                <div class="topic-chip" data-name="<%= topic.TOPIC_NAME.toLowerCase() %>">
+                                    <div class="topic-header">
+                                        <div class="topic-icon">
+                                            <span class="material-icons">topic</span>
+                                        </div>
+                                        <div>
+                                            <div class="topic-title"><%= topic.TOPIC_NAME %></div>
+                                            <span class="topic-subject">Study Topic</span>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;">
+                                        Comprehensive review and evaluation module.
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p style="color: var(--text-muted);">No topics loaded yet.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </main>
         </div>
-
-    </div>
-
-    <div id="search-container">
-        <input type="text" id="search-field" placeholder="Enter topic name">
-        <button id="search-button" onclick="searchTopics()">Search</button>
     </div>
 
     <script>
-        function viewTopics() {
-            // Make an asynchronous request to fetch topics from the server
-            fetch('/get-all-topics')
-                .then(response => response.json())
-                .then(data => {
-                    const contentContainer = document.getElementById('content-container');
-                    contentContainer.innerHTML = `<h2>TOPICS</h2>`;
-
-                    if (Array.isArray(data)) {
-                        // If data is an array, display as a vertical list
-                        const list = document.createElement('ul');
-                        data.forEach(item => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = item.TOPIC_NAME + ' -- ' + item.TOPIC_DESCRIPTION;
-                            list.appendChild(listItem);
-                        });
-                        contentContainer.appendChild(list);
-                    } else {
-                        // If data is not an array, display a message
-                        const message = document.createElement('p');
-                        message.textContent = 'No data available.';
-                        contentContainer.appendChild(message);
-                    }
-                })
-                .catch(error => console.error('Error fetching topics:', error));
-        }
-
-        function searchTopics() {
-            const searchField = document.getElementById('search-field');
-            const searchTerm = searchField.value.trim();
-
-            // Check if the search term is not empty
-            if (searchTerm !== '') {
-                // Make an asynchronous request to search topics with the given term
-                fetch('/search-topics', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ searchTerm })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        const contentContainer = document.getElementById('content-container');
-                        contentContainer.innerHTML = `<h2>Search Results for '${searchTerm}'</h2>`;
-
-                        if (Array.isArray(data)) {
-                            // If data is an array, display as a vertical list
-                            const list = document.createElement('ul');
-                            data.forEach(item => {
-                                const listItem = document.createElement('li');
-                                listItem.textContent = item.TOPIC_NAME + ' -- ' + item.TOPIC_DESCRIPTION;
-                                list.appendChild(listItem);
-                            });
-                            contentContainer.appendChild(list);
-                        } else {
-                            // If data is not an array, display a message
-                            const message = document.createElement('p');
-                            message.textContent = 'No data available.';
-                            contentContainer.appendChild(message);
-                        }
-                    })
-                    .catch(error => console.error('Error searching topics:', error));
-            } else {
-                alert('Please enter a search term.');
-            }
-        }
-
-        function viewSubjects() {
-            // Make an asynchronous request to fetch subjects from the server
-            fetch('/get-subjects')
-                .then(response => response.json())
-                .then(data => {
-                    displayDataInContainer(data, 'Subjects');
-                })
-                .catch(error => console.error('Error fetching subjects:', error));
-        }
-
-        function viewQuestionsByTopic() {
-            window.location.href = '/questions';
-        }
-
-        function viewPracticeQuestions() {
-            window.location.href = '/student/questions';
-        }
-
-        function createExams() {
-            window.location.href = '/student/create-exam';
-        }
-
-        function viewExams() {
-            window.location.href = '/student/exams';
-        }
-
-        function viewAssignments() {
-            window.location.href = '/student/assignments';
-        }
-
-        function viewProfile() {
-            window.location.href = '/student/profile';
-        }
-
-        function displayDataInContainer(data, title) {
-            // Display the data in the content container
-            const contentContainer = document.getElementById('content-container');
-            contentContainer.innerHTML = `<h2>${title}</h2>`;
-
-            if (Array.isArray(data)) {
-                // If data is an array, display as a vertical list
-                const list = document.createElement('ul');
-                data.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = item.name; // Modify to match the data structure
-                    list.appendChild(listItem);
-                });
-                contentContainer.appendChild(list);
-            } else {
-                // If data is not an array, display a message
-                const message = document.createElement('p');
-                message.textContent = 'No data available.';
-                contentContainer.appendChild(message);
-            }
-        }
-
-        function toggleSearchContainer() {
-            // Toggle the visibility of the search container
-            const searchContainer = document.getElementById('search-container');
-            searchContainer.style.display = searchContainer.style.display === 'none' ? 'flex' : 'none';
+        function filterTopics() {
+            const query = document.getElementById('topicSearchInput').value.toLowerCase().trim();
+            const chips = document.querySelectorAll('.topic-chip');
+            chips.forEach(chip => {
+                const text = chip.getAttribute('data-name') || '';
+                chip.style.display = text.includes(query) ? 'flex' : 'none';
+            });
         }
     </script>
-
 </body>
 
 </html>

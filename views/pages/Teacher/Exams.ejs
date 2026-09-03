@@ -4,240 +4,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Exams</title>
-    <!-- Material Icons -->
+    <title>Faculty Exam Management | Teacher Portal</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Material Theme CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        #header {
-            background-color: #004985;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .container {
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        th,
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        tr:hover {
-            background-color: #79eee7;
-        }
-
-        .hide {
+        .tab-pane {
             display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .exam-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <div id="header">
-        <h2>All Exams</h2>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon" style="background: var(--secondary-gradient);">
+                    <span class="material-icons">psychology</span>
+                </div>
+                <div class="brand-title">Teacher Command Center</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/teacher" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Faculty Tools</div>
+                <a href="/teacher" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/teacher/exams" class="sidebar-item active">
+                    <span class="material-icons">library_books</span>
+                    <span>View Exams</span>
+                </a>
+                <a href="/teacher/create-exam" class="sidebar-item">
+                    <span class="material-icons">playlist_add</span>
+                    <span>Create Exam</span>
+                </a>
+                <a href="/teacher/question-creation" class="sidebar-item">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>Add Question</span>
+                </a>
+                <a href="/teacher/create-question-set" class="sidebar-item">
+                    <span class="material-icons">rule</span>
+                    <span>Question Sets</span>
+                </a>
+                <a href="/teacher/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/teacher/create-assignment" class="sidebar-item">
+                    <span class="material-icons">add_to_queue</span>
+                    <span>Create Assignment</span>
+                </a>
+                <a href="/teacher/modify-topic-subject" class="sidebar-item">
+                    <span class="material-icons">category</span>
+                    <span>Subjects & Topics</span>
+                </a>
+                <a href="/teacher/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>Faculty Profile</span>
+                </a>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: #0EA5E9;">library_books</span>
+                            Managed Examinations
+                        </h1>
+                        <p class="page-subtitle">Oversee running test sessions, scheduled evaluations, and student submission histories</p>
+                    </div>
+                    <div>
+                        <a href="/teacher/create-exam" class="btn btn-primary" style="background: var(--secondary-gradient);">
+                            <span class="material-icons" style="font-size: 18px;">add</span>
+                            <span>Schedule New Exam</span>
+                        </a>
+                    </div>
+                </div>
+
+                <%
+                    const now = new Date();
+                    let ongoingCount = 0;
+                    let upcomingCount = 0;
+                    let pastCount = 0;
+
+                    (exams || []).forEach(exam => {
+                        const start = new Date(exam.EXAM_TIME);
+                        const end = new Date(start.getTime() + (exam.EXAM_DURATION || 0) * 60000);
+                        if (now >= start && now <= end) ongoingCount++;
+                        else if (start > now) upcomingCount++;
+                        else pastCount++;
+                    });
+                %>
+
+                <!-- Segmented Tabs -->
+                <div class="tab-bar">
+                    <button class="tab-btn active" onclick="switchTab('ongoing')">
+                        Live Examinations (<%= ongoingCount %>)
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('upcoming')">
+                        Upcoming Schedule (<%= upcomingCount %>)
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('past')">
+                        Concluded Exams (<%= pastCount %>)
+                    </button>
+                </div>
+
+                <!-- Ongoing Exams Pane -->
+                <div id="pane-ongoing" class="tab-pane active">
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Exam ID</th>
+                                        <th>Exam Title</th>
+                                        <th>Academic Level</th>
+                                        <th>Question Set</th>
+                                        <th>Duration</th>
+                                        <th>Time Remaining</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let hasOngoing = false; %>
+                                    <% (exams || []).forEach(exam => { %>
+                                        <% 
+                                            const examTime = new Date(exam.EXAM_TIME);
+                                            const endTime = new Date(examTime.getTime() + exam.EXAM_DURATION * 60000);
+                                            const currentTime = new Date();
+                                        %>
+                                        <% if (currentTime >= examTime && currentTime <= endTime) { %>
+                                            <% hasOngoing = true; %>
+                                            <tr>
+                                                <td><strong>#<%= exam.EXAM_ID %></strong></td>
+                                                <td>
+                                                    <div style="font-weight: 600;"><%= exam.EXAM_NAME || exam.EXAM_TYPE || 'Standard Exam' %></div>
+                                                    <div style="font-size: 0.78rem; color: var(--text-muted);">Scheduled by: <%= exam.SCHEDULED_BY || 'Faculty' %></div>
+                                                </td>
+                                                <td><span class="badge" style="background: #E0E7FF; color: #4338CA;"><%= exam.LEVEL_NAME %></span></td>
+                                                <td>Set #<%= exam.QUESTION_SET_ID %></td>
+                                                <td><%= exam.EXAM_DURATION %> Mins</td>
+                                                <td id="remaining-time-<%= exam.EXAM_ID %>" style="font-weight: 600; color: #DC2626;">Calculating...</td>
+                                                <td style="text-align: right;">
+                                                    <a href="/teacher/exams/<%= exam.EXAM_ID %>" class="btn btn-outline btn-sm">
+                                                        <span>View Details</span>
+                                                        <span class="material-icons" style="font-size: 16px;">visibility</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% }); %>
+                                    <% if (!hasOngoing) { %>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                                No examinations currently in progress.
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Exams Pane -->
+                <div id="pane-upcoming" class="tab-pane">
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Exam ID</th>
+                                        <th>Exam Title</th>
+                                        <th>Academic Level</th>
+                                        <th>Question Set</th>
+                                        <th>Duration</th>
+                                        <th>Launch Time</th>
+                                        <th>Starts In</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let hasUpcoming = false; %>
+                                    <% (exams || []).forEach(exam => { %>
+                                        <% const examTime = new Date(exam.EXAM_TIME); %>
+                                        <% if (examTime > new Date()) { %>
+                                            <% hasUpcoming = true; %>
+                                            <tr>
+                                                <td><strong>#<%= exam.EXAM_ID %></strong></td>
+                                                <td>
+                                                    <div style="font-weight: 600;"><%= exam.EXAM_NAME || exam.EXAM_TYPE || 'Standard Exam' %></div>
+                                                    <div style="font-size: 0.78rem; color: var(--text-muted);">Scheduled by: <%= exam.SCHEDULED_BY || 'Faculty' %></div>
+                                                </td>
+                                                <td><span class="badge" style="background: #E0E7FF; color: #4338CA;"><%= exam.LEVEL_NAME %></span></td>
+                                                <td>Set #<%= exam.QUESTION_SET_ID %></td>
+                                                <td><%= exam.EXAM_DURATION %> Mins</td>
+                                                <td><%= new Date(exam.EXAM_TIME).toLocaleString() %></td>
+                                                <td id="remaining-time-upcoming-<%= exam.EXAM_ID %>" style="font-weight: 600; color: #B45309;">Calculating...</td>
+                                            </tr>
+                                        <% } %>
+                                    <% }); %>
+                                    <% if (!hasUpcoming) { %>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                                No upcoming examinations scheduled.
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Exams Pane -->
+                <div id="pane-past" class="tab-pane">
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Exam ID</th>
+                                        <th>Exam Title</th>
+                                        <th>Academic Level</th>
+                                        <th>Concluded On</th>
+                                        <th>Question Set</th>
+                                        <th style="text-align: right;">Submissions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let hasPast = false; %>
+                                    <% (exams || []).forEach(exam => { %>
+                                        <% 
+                                            const examTime = new Date(exam.EXAM_TIME);
+                                            const endTime = new Date(examTime.getTime() + exam.EXAM_DURATION * 60000);
+                                        %>
+                                        <% if (new Date() > endTime) { %>
+                                            <% hasPast = true; %>
+                                            <tr>
+                                                <td><strong>#<%= exam.EXAM_ID %></strong></td>
+                                                <td>
+                                                    <div style="font-weight: 600;"><%= exam.EXAM_NAME || exam.EXAM_TYPE || 'Standard Exam' %></div>
+                                                </td>
+                                                <td><span class="badge" style="background: #F1F5F9; color: #475569;"><%= exam.LEVEL_NAME %></span></td>
+                                                <td><%= new Date(exam.EXAM_TIME).toLocaleDateString() %></td>
+                                                <td>Set #<%= exam.QUESTION_SET_ID %></td>
+                                                <td style="text-align: right;">
+                                                    <a href="/teacher/exams/<%= exam.EXAM_ID %>" class="btn btn-outline btn-sm">
+                                                        <span>Submissions & Scores</span>
+                                                        <span class="material-icons" style="font-size: 16px;">people</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% }); %>
+                                    <% if (!hasPast) { %>
+                                        <tr>
+                                            <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                                No past examination records found.
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
-
-    <!-- Content -->
-    <div class="container">
-
-        <h3>Ongoing Exams</h3>
-        <button onclick="toggleTable('ongoing')">Show Table</button>
-        <table id="ongoing-table">
-            <thead>
-                <tr>
-                    <th>Exam ID</th>
-                    <th>Exam Type</th>
-                    <th>Scheduled By</th>
-                    <th>Question Set ID</th>
-                    <th>Exam Date</th>
-                    <th>Level Name</th>
-                    <th>Remaining Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% exams.forEach(exam => { %>
-                    <% const examTime = new Date(exam.EXAM_TIME); %>
-                    <% const examDurationMinutes = exam.EXAM_DURATION; %>
-                    <% const endTime = new Date(examTime.getTime() + examDurationMinutes * 60000); %>
-                    <% const currentTime = new Date(); %>
-                    <% if (currentTime >= examTime && currentTime <= endTime) { %>
-                        <tr onclick="redirectToExamDetails('<%= exam.EXAM_ID %>')" style="cursor: pointer;">
-                            <td><%= exam.EXAM_ID %></td>
-                            <td><%= exam.EXAM_TYPE %></td>
-                            <td><%= exam.SCHEDULED_BY %></td>
-                            <td><%= exam.QUESTION_SET_ID %></td>
-                            <td><%= exam.EXAM_TIME %></td>
-                            <td><%= exam.LEVEL_NAME %></td>
-                            <td id="remaining-time-<%= exam.EXAM_ID %>"></td> <!-- Leave it empty initially -->
-                        </tr>
-                    <% } %>
-                <% }); %>
-            </tbody>
-        </table>
-
-
-        <h3>Upcoming Exams</h3>
-        <button onclick="toggleTable('upcoming')">Show Table</button>
-        <table id="upcoming-table">
-            <thead>
-                <tr>
-                    <th>Exam ID</th>
-                    <th>Exam Type</th>
-                    <th>Scheduled By</th>
-                    <th>Question Set ID</th>
-                    <th>Exam Date</th>
-                    <th>Level Name</th>
-                    <th>Remaining Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% exams.forEach(exam => { %>
-                    <% if (new Date(exam.EXAM_TIME) >= new Date()) { %>
-                        <tr onclick="redirectToExamDetails('<%= exam.EXAM_ID %>')" style="cursor: pointer;">
-                            <td><%= exam.EXAM_ID %></td>
-                            <td><%= exam.EXAM_TYPE %></td>
-                            <td><%= exam.SCHEDULED_BY %></td>
-                            <td><%= exam.QUESTION_SET_ID %></td>
-                            <td><%= exam.EXAM_TIME %></td>
-                            <td><%= exam.LEVEL_NAME %></td>
-                            <td id="remaining-time-upcoming-<%= exam.EXAM_ID %>"></td> <!-- Leave it empty initially -->
-                        </tr>
-                    <% } %>
-                <% }); %>
-            </tbody>
-        </table>
-
-        <h3>Past Exams</h3>
-        <button onclick="toggleTable('past')">Show Table</button>
-        <table id="past-table">
-            <thead>
-                <tr>
-                    <th>Exam ID</th>
-                    <th>Exam Type</th>
-                    <th>Scheduled By</th>
-                    <th>Question Set ID</th>
-                    <th>Exam Date</th>
-                    <th>Level Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% exams.forEach(exam => { %>
-                    <% const examTime = new Date(exam.EXAM_TIME); %>
-                    <% const examDurationMinutes = exam.EXAM_DURATION; %>
-                    <% const endTime = new Date(examTime.getTime() + examDurationMinutes * 60000); %>
-                    <% const currentTime = new Date(); %>
-                    <% if (currentTime >= examTime && currentTime > endTime) { %>
-                        <tr onclick="redirectToExamDetails('<%= exam.EXAM_ID %>')" style="cursor: pointer;">
-                            <td><%= exam.EXAM_ID %></td>
-                            <td><%= exam.EXAM_TYPE %></td>
-                            <td><%= exam.SCHEDULED_BY %></td>
-                            <td><%= exam.QUESTION_SET_ID %></td>
-                            <td><%= exam.EXAM_TIME %></td>
-                            <td><%= exam.LEVEL_NAME %></td>
-                        </tr>
-                    <% } %>
-                <% }); %>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
     <script>
-        function redirectToExamDetails(examId) {
-            window.location.href = '/teacher/exams/' + examId; // Replace '/exam/' with the actual route for exam details
+        function switchTab(tabKey) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+            const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(tabKey));
+            if (targetBtn) targetBtn.classList.add('active');
+
+            const targetPane = document.getElementById('pane-' + tabKey);
+            if (targetPane) targetPane.classList.add('active');
         }
 
-        function formatRemainingTime(startTime, endTime) {
-            var diff = Math.abs(endTime - startTime) / 1000; // Difference in seconds
+        function formatDuration(diffSeconds) {
+            if (diffSeconds <= 0) return "0s";
+            const days = Math.floor(diffSeconds / 86400);
+            const hours = Math.floor((diffSeconds % 86400) / 3600);
+            const minutes = Math.floor((diffSeconds % 3600) / 60);
+            const seconds = Math.floor(diffSeconds % 60);
 
-            if(diff==0)
-            {
-                window.location.reload();
-            }
-
-            var days = Math.floor(diff / 86400); // 1 day = 86400 seconds
-            var hours = Math.floor((diff % 86400) / 3600); // 1 hour = 3600 seconds
-            var minutes = Math.floor(((diff % 86400) % 3600) / 60); // 1 minute = 60 seconds
-            var seconds = Math.floor(((diff % 86400) % 3600) % 60);
-
-            if (days > 0) {
-                return days + " days, " + hours + " hours, " + minutes + " minutes";
-            } 
-            else {
-                return hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
-            }
+            if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+            if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+            return `${minutes}m ${seconds}s`;
         }
 
-        function toggleTable(tableId) {
-            var table = document.getElementById(tableId + '-table');
-            table.classList.toggle('hide');
-        }
+        function updateCountdowns() {
+            const now = new Date();
+            <% (exams || []).forEach(exam => { %>
+                (function() {
+                    const examStart = new Date('<%= exam.EXAM_TIME %>');
+                    const examEnd = new Date(examStart.getTime() + <%= exam.EXAM_DURATION %> * 60000);
 
-        // Function to update remaining time every second
-        function updateRemainingTime() {
-            var currentTime = new Date();
-            <% exams.forEach(exam => { %>
-                var examId = '<%= exam.EXAM_ID %>';
-                var examTime = new Date('<%= exam.EXAM_TIME %>');
-                var examDurationMinutes = <%= exam.EXAM_DURATION %>;
-                var endTime = new Date(examTime.getTime() + examDurationMinutes * 60000);
-                var remainingTimeElement = document.getElementById('remaining-time-' + examId);
-                var remainingTime = formatRemainingTime(currentTime, endTime);
-                if (remainingTimeElement) {
-                    remainingTimeElement.innerText = remainingTime;
-                    if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
-                        window.location.reload(); // Reload the page if remaining time is 0 seconds
+                    const ongoingEl = document.getElementById('remaining-time-<%= exam.EXAM_ID %>');
+                    if (ongoingEl) {
+                        const diff = (examEnd - now) / 1000;
+                        ongoingEl.textContent = diff <= 0 ? 'Concluded' : formatDuration(diff);
                     }
-                }
-                var remainingTimeUpcomingElement = document.getElementById('remaining-time-upcoming-' + examId);
-                if (remainingTimeUpcomingElement) {
-                    remainingTimeUpcomingElement.innerText = remainingTime;
-                    if (remainingTime === "0 hours, 0 minutes, 0 seconds") {
-                        window.location.reload(); // Reload the page if remaining time is 0 seconds
+
+                    const upcomingEl = document.getElementById('remaining-time-upcoming-<%= exam.EXAM_ID %>');
+                    if (upcomingEl) {
+                        const diff = (examStart - now) / 1000;
+                        upcomingEl.textContent = diff <= 0 ? 'Launching' : formatDuration(diff);
                     }
-                }
+                })();
             <% }); %>
         }
 
-        // Call the updateRemainingTime function every second
-        setInterval(updateRemainingTime, 1000);
+        setInterval(updateCountdowns, 1000);
+        updateCountdowns();
     </script>
-
 </body>
 
 </html>

@@ -4,99 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Exam</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-
-        main {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        input[type="number"],
-        textarea,
-        select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 5px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-    </style>
+    <title>Create Practice Exam | Student Portal</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
 </head>
 
 <body>
-    <header>
-        <h1>Create Exam</h1>
-    </header>
-    <main>
-        <form action="/student/create-exam" method="POST">
-            <div class="form-group">
-                <label for="examName">Exam Name:</label>
-                <input type="text" id="examName" name="examName" required>
-            </div>
-            <div class="form-group">
-                <label for="examDate">Exam Date:</label>
-                <input type="datetime-local" id="examDate" name="examDate" required>
-            </div>
-            <div class="form-group">
-                <label for="examDuration">Exam Duration (in minutes):</label>
-                <input type="number" id="examDuration" name="examDuration" required>
-            </div>
-            <div class="form-group">
-                <label for="academicLevel">Academic Level:</label>
-                <select id="academicLevel" name="academicLevel" required>
-                    <% academicLevels.forEach(function(level) { %>
-                    <option value="<%= level.LEVEL_NAME %>"><%= level.LEVEL_NAME %></option>
-                    <% }); %>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="questionSet">Question Set:</label>
-                <select id="questionSet" name="questionSet" required>
-                    <% questionSets.forEach(function(question) { %>
-                    <option value="<%= question.QUESTION_SET_ID %>"><%= question.QUESTION_SET_ID %> -
-                        <%= question.QUESTION_SET_NAME %></option>
-                    <% }); %>
-                </select>
-            </div>
-            <button type="submit">Create Exam</button>
-        </form>
-    </main>
 
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="app-navbar">
+            <div class="brand-wrapper">
+                <div class="brand-icon">
+                    <span class="material-icons">school</span>
+                </div>
+                <div class="brand-title">Student Portal</div>
+            </div>
+            <div class="nav-actions">
+                <a href="/student" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/logout" class="btn btn-outline btn-sm">
+                    <span class="material-icons" style="font-size: 16px;">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <nav class="app-sidebar">
+                <div class="sidebar-heading">Navigation</div>
+                <a href="/student" class="sidebar-item">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/student/exams" class="sidebar-item">
+                    <span class="material-icons">assignment_turned_in</span>
+                    <span>Exams</span>
+                </a>
+                <a href="/student/create-exam" class="sidebar-item active">
+                    <span class="material-icons">add_task</span>
+                    <span>Practice Exam</span>
+                </a>
+                <a href="/student/questions" class="sidebar-item">
+                    <span class="material-icons">menu_book</span>
+                    <span>Question Practice</span>
+                </a>
+                <a href="/student/assignments" class="sidebar-item">
+                    <span class="material-icons">assignment</span>
+                    <span>Assignments</span>
+                </a>
+                <a href="/student/profile" class="sidebar-item">
+                    <span class="material-icons">person</span>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="app-main">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="material-icons" style="font-size: 32px; color: var(--primary);">add_task</span>
+                            Configure Self-Practice Exam
+                        </h1>
+                        <p class="page-subtitle">Schedule a timed practice session to test your knowledge against prepared question sets</p>
+                    </div>
+                </div>
+
+                <div class="card" style="max-width: 680px;">
+                    <form action="/student/create-exam" method="POST">
+                        <div class="form-group">
+                            <label class="form-label" for="examName">Exam Title</label>
+                            <input type="text" id="examName" name="examName" class="form-control" placeholder="e.g. My Algorithm Practice Test" required>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="examDate">Scheduled Time</label>
+                                <input type="datetime-local" id="examDate" name="examDate" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="examDuration">Duration (Minutes)</label>
+                                <input type="number" id="examDuration" name="examDuration" class="form-control" min="5" max="180" value="30" required>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="academicLevel">Academic Level</label>
+                                <select id="academicLevel" name="academicLevel" class="form-control" required>
+                                    <% (academicLevels || []).forEach(function(level) { %>
+                                        <option value="<%= level.LEVEL_NAME %>"><%= level.LEVEL_NAME %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="questionSet">Target Question Set</label>
+                                <select id="questionSet" name="questionSet" class="form-control" required>
+                                    <% (questionSets || []).forEach(function(set) { %>
+                                        <option value="<%= set.QUESTION_SET_ID %>">
+                                            #<%= set.QUESTION_SET_ID %> &bull; <%= set.QUESTION_SET_NAME %>
+                                        </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px; width: 100%;">
+                            <span class="material-icons" style="font-size: 18px;">play_arrow</span>
+                            <span>Generate & Schedule Practice Exam</span>
+                        </button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Set default examDate to now + 1 minute
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        const isoStr = now.toISOString().slice(0, 16);
+        const dateInput = document.getElementById('examDate');
+        if (dateInput) {
+            dateInput.value = isoStr;
+        }
+    </script>
 </body>
 
 </html>

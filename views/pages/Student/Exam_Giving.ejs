@@ -4,239 +4,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiple Forms Submission with MCQs</title>
+    <title>Active Assessment | Exam Management System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            background-color: #F8FAFC;
+            padding-bottom: 80px;
+        }
+
+        .sticky-exam-header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 28px;
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
         }
 
-        header {
-            background-color: thistle;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            width: 100%;
+        .timer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: #FEF3C7;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+            border-radius: var(--radius-full);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
         }
 
-        header .head1 {
-            font-size: 40px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #2ecc71;
+        .timer-badge.urgent {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-color: #FECACA;
+            animation: pulse 1s infinite;
         }
 
-        header .head2 {
-            font-size: 18px;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
         }
 
-        .main-content {
+        .exam-content {
+            max-width: 860px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
+
+        .question-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .question-card:hover {
+            border-color: #C7D2FE;
+        }
+
+        .question-meta {
             display: flex;
-            flex: 1;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
         }
 
-        .left-section {
-            width: 15%;
-            background-color: #f4f4f4;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
+        .question-number {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .right-section {
-            flex: 1;
-            padding: 20px;
-        }
-
-        form {
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.5;
             margin-bottom: 20px;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        form p {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        form label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        button {
-            display: block;
-            margin-bottom: 10px;
-            padding: 10px 20px;
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: #FFFFFF;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all var(--transition-fast);
+            font-size: 0.95rem;
+            color: var(--text-main);
         }
 
-        button:hover {
-            background-color: #27ae60;
+        .option-label:hover {
+            background: #F8FAFC;
+            border-color: #CBD5E1;
         }
 
-        #timer {
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 20px;
+        .option-label.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary-hover);
+            font-weight: 600;
         }
 
-        footer {
-            background-color: #34495e;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-            width: 100%;
-        }
-
-        footer .foot1 {
-            font-size: 14px;
+        .option-label input[type="radio"] {
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="head1">EXAM MANAGEMENT SYSTEM</div>
-        <div class="head2">An exam management system for students and teachers of all kind</div>
-    </header>
 
-    <div class="main-content">
-        <div class="left-section">
-            <button id="submitBtn">Submit All Forms</button>
-            <p><a href="/student">Back to Student Page</a></p>
+    <!-- Sticky Assessment Header -->
+    <header class="sticky-exam-header">
+        <div class="brand-wrapper">
+            <div class="brand-icon">
+                <span class="material-icons">quiz</span>
+            </div>
+            <div>
+                <div style="font-weight: 700; font-size: 1.1rem;"><%= examDurationMinutes[0].EXAM_TYPE || 'Live Examination' %></div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Assessment ID: #<%= examDurationMinutes[0].EXAM_ID %></div>
+            </div>
         </div>
 
-        <div class="right-section">
-            <div id="timer">
-                <%= examDurationMinutes[0].EXAM_DURATION %> Minutes
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div id="proctorBadge" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 9999px; color: #047857; font-size: 0.82rem; font-weight: 600;">
+                <span class="material-icons" style="font-size: 16px;">shield</span>
+                <span>Proctored: <span id="violationCount">0</span>/3</span>
             </div>
-            <% questioncollections.forEach( question=>{ %>
-                <form id="form1">
-                    <p>QUESTION:<%=question.QUESTION_BODY%>
-                    </p>
-                    <label for="q1_option1"><input type="radio" id="q1_option1" name="<%=question.QUESTION_ID %>"
-                            value="<%=question.OPTION_1 %>">
-                        <%=question.OPTION_1 %>
-                    </label>
-                    <label for="q1_option2"><input type="radio" id="q1_option2" name="<%=question.QUESTION_ID %>"
-                            value="<%=question.OPTION_2 %>">
-                        <%=question.OPTION_2 %>
-                    </label>
-                    <label for="q1_option3"><input type="radio" id="q1_option3" name="<%=question.QUESTION_ID %>"
-                            value="<%=question.OPTION_3 %>">
-                        <%=question.OPTION_3 %>
-                    </label>
-                    <label for="q1_option4"><input type="radio" id="q1_option4" name="<%=question.QUESTION_ID %>"
-                            value="<%=question.OPTION_4 %>">
-                        <%=question.OPTION_4 %>
-                    </label>
-                </form>
-                <% }) %>
+
+            <button type="button" class="btn btn-outline btn-sm" onclick="toggleFullScreen()" title="Toggle Fullscreen" style="padding: 6px 10px;">
+                <span class="material-icons" style="font-size: 18px;">fullscreen</span>
+            </button>
+
+            <div id="timerContainer" class="timer-badge">
+                <span class="material-icons" style="font-size: 20px;">timer</span>
+                <span id="timerDisplay">Calculating...</span>
+            </div>
+
+            <button id="submitBtn" type="button" class="btn btn-primary" onclick="confirmSubmit()">
+                <span class="material-icons" style="font-size: 18px;">check_circle</span>
+                <span>Submit Exam</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Floating Anti-Cheating Warning Banner -->
+    <div id="proctorAlert" style="display: none; position: fixed; top: 85px; left: 50%; transform: translateX(-50%); z-index: 9999; background: #FEF2F2; border: 2px solid #EF4444; border-radius: 12px; padding: 16px 24px; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.25); max-width: 520px; width: 90%; text-align: center;">
+        <div style="font-weight: 700; color: #991B1B; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span class="material-icons" style="color: #DC2626;">warning</span>
+            <span>Anti-Cheating Monitor Alert</span>
+        </div>
+        <div id="proctorAlertText" style="color: #7F1D1D; font-size: 0.85rem; margin-top: 6px; font-weight: 500;">
+            Tab switch or window focus departure detected!
         </div>
     </div>
 
-    <footer>
-        <div class="foot1">&copy; EXAM MANAGEMENT SYSTEM</div>
-    </footer>
+    <main class="exam-content">
+        <% (questioncollections || []).forEach((question, index) => { %>
+            <div class="question-card" data-question-id="<%= question.QUESTION_ID %>">
+                <div class="question-meta">
+                    <span class="question-number">Question <%= index + 1 %> of <%= questioncollections.length %></span>
+                    <span class="badge" style="background: #F1F5F9; color: var(--text-muted);">Single Choice</span>
+                </div>
+                
+                <div class="question-text"><%= question.QUESTION_BODY %></div>
+
+                <div class="options-list">
+                    <% [question.OPTION_1, question.OPTION_2, question.OPTION_3, question.OPTION_4].forEach((opt, optIdx) => { %>
+                        <% if (opt && opt.trim()) { %>
+                            <label class="option-label" onclick="selectOption(this)">
+                                <input type="radio" name="q_<%= question.QUESTION_ID %>" value="<%= opt %>" onchange="updateAnsweredCount()">
+                                <span><%= opt %></span>
+                            </label>
+                        <% } %>
+                    <% }); %>
+                </div>
+            </div>
+        <% }); %>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <button type="button" class="btn btn-primary" style="padding: 14px 36px; font-size: 1.05rem;" onclick="confirmSubmit()">
+                <span class="material-icons">send</span>
+                <span>Finish & Submit Exam</span>
+            </button>
+        </div>
+    </main>
 
     <script>
-        let timerDisplay = document.getElementById("timer");
-        // Parse the exam start time and duration from your server response
-        let examStartTime = new Date('<%= examDurationMinutes[0].EXAM_TIME %>'); // Assuming examStartTime is provided by your server
-        let duration = <%= examDurationMinutes[0].EXAM_DURATION %>; // Assuming examDurationMinutes is provided by your server
+        const examType = '<%= (examDurationMinutes && examDurationMinutes[0] && examDurationMinutes[0].EXAM_TYPE) || "Scheduled" %>';
+        const durationMins = <%= (examDurationMinutes && examDurationMinutes[0] && examDurationMinutes[0].EXAM_DURATION) || 30 %>;
+        let examStartTime;
+        let examEndTime;
 
-        // Calculate the end time of the exam by adding the duration to the start time
-        let endTime = new Date(examStartTime.getTime() + (duration * 60 * 1000));
+        if (examType === 'Practice') {
+            const storageKey = 'practice_exam_start_<%= examDurationMinutes[0].EXAM_ID %>';
+            let storedStart = sessionStorage.getItem(storageKey);
+            if (!storedStart) {
+                storedStart = new Date().toISOString();
+                sessionStorage.setItem(storageKey, storedStart);
+            }
+            examStartTime = new Date(storedStart);
+        } else {
+            examStartTime = new Date('<%= examDurationMinutes[0].EXAM_TIME %>');
+        }
+        examEndTime = new Date(examStartTime.getTime() + durationMins * 60000);
 
-        // Calculate the total time in seconds between the end time of the exam and the current time
-        let currentTime = new Date();
-        let totalTimeInSeconds = Math.floor((endTime - currentTime) / 1000);
+        let totalSeconds = Math.max(0, Math.floor((examEndTime - new Date()) / 1000));
+        let submitted = false;
 
-        let manualSubmit = false;
+        function updateTimer() {
+            if (submitted) return;
+            totalSeconds = Math.max(0, Math.floor((examEndTime - new Date()) / 1000));
 
-        function startTimer() {
-            let timer = setInterval(function () {
-                totalTimeInSeconds--; // Decrease the total time in seconds
-                let minutes = Math.floor(totalTimeInSeconds / 60);
-                let seconds = totalTimeInSeconds % 60;
-                timerDisplay.textContent = `${minutes
-                    .toString()
-                    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")} Minutes`;
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerContainer = document.getElementById('timerContainer');
 
-                if (totalTimeInSeconds <= 0) {
-                    clearInterval(timer);
-                    if (!manualSubmit) {
-                        submitAllForms();
-                    }
-                    alert("Time is up!");
-                }
-            }, 1000);
+            timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+            if (totalSeconds < 300) {
+                timerContainer.classList.add('urgent');
+            }
+
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                alert("Time is up! Submitting your answers automatically.");
+                executeSubmit();
+            }
         }
 
-        startTimer();
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
 
-        document.getElementById('submitBtn').addEventListener('click', function () {
-            if (totalTimeInSeconds <= 0) {
-                alert("Time is up!\n You can not submit anything")
+        function selectOption(labelEl) {
+            const parent = labelEl.closest('.options-list');
+            parent.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+            labelEl.classList.add('selected');
+        }
+
+        function updateAnsweredCount() {
+            // Can be used for progress bar if desired
+        }
+
+        function confirmSubmit() {
+            const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+            const total = <%= (questioncollections || []).length %>;
+            if (confirm(`You have answered ${answered} of ${total} questions. Are you sure you want to finish and submit?`)) {
+                executeSubmit();
             }
-            else {
-                manualSubmit = true;
-                submitAllForms();
-            }
-        });
+        }
 
-        function submitAllForms() {
-            var formDataArray = [];
+        async function executeSubmit() {
+            if (submitted) return;
+            submitted = true;
 
-            var forms = document.querySelectorAll('form');
+            const submitBtns = document.querySelectorAll('#submitBtn, button[onclick="confirmSubmit()"]');
+            submitBtns.forEach(b => {
+                b.disabled = true;
+                b.innerHTML = 'Submitting...';
+            });
 
-            forms.forEach(function (form) {
-                var formData = {};
-                var inputs = form.querySelectorAll('input[type="radio"]:checked');
-
-                if (inputs.length > 0) {
-                    inputs.forEach(function (input) {
-                        formData["QUESTION_ID"] = input.name;
-                        formData["GIVEN_ANSWER"] = input.value;
+            const answers = [];
+            document.querySelectorAll('.question-card').forEach(card => {
+                const qid = card.getAttribute('data-question-id');
+                const checked = card.querySelector('input[type="radio"]:checked');
+                if (checked) {
+                    answers.push({
+                        QUESTION_ID: qid,
+                        GIVEN_ANSWER: checked.value
                     });
-
-                    formDataArray.push(formData);
                 }
             });
 
-            var jsonData = JSON.stringify(formDataArray);
-
-            // Send jsonData to the server
-            fetch('/student/exams/<%= examDurationMinutes[0].EXAM_ID %>/submit-exam-answer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonData
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Form data submitted successfully!');
-                    } else {
-                        console.error('Failed to submit form data');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+            try {
+                const response = await fetch('/student/exams/<%= examDurationMinutes[0].EXAM_ID %>/submit-exam-answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(answers)
                 });
+
+                if (response.ok) {
+                    sessionStorage.removeItem('practice_exam_start_<%= examDurationMinutes[0].EXAM_ID %>');
+                    alert('Exam submitted successfully!');
+                    window.location.href = '/student/exams/past/<%= examDurationMinutes[0].EXAM_ID %>';
+                } else {
+                    alert('Failed to submit exam. Please contact your instructor.');
+                    submitted = false;
+                    submitBtns.forEach(b => b.disabled = false);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error submitting answers. Retrying...');
+                submitted = false;
+                submitBtns.forEach(b => b.disabled = false);
+            }
+        }
+
+        // Anti-Cheating & Proctoring Monitor
+        let violations = 0;
+        const maxViolations = 3;
+        const proctorAlert = document.getElementById('proctorAlert');
+        const proctorAlertText = document.getElementById('proctorAlertText');
+        const violationCount = document.getElementById('violationCount');
+
+        function triggerViolation(reason) {
+            if (submitted) return;
+            violations++;
+            if (violationCount) violationCount.innerText = violations;
+
+            if (proctorAlert && proctorAlertText) {
+                proctorAlertText.innerText = `${reason} (Warning ${violations} of ${maxViolations}). At ${maxViolations} violations, your exam will be auto-submitted!`;
+                proctorAlert.style.display = 'block';
+                setTimeout(() => {
+                    if (proctorAlert && violations < maxViolations) {
+                        proctorAlert.style.display = 'none';
+                    }
+                }, 4500);
+            }
+
+            if (violations >= maxViolations) {
+                alert('Maximum allowed window departures exceeded (3/3). Your exam is being automatically submitted for review.');
+                executeSubmit();
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                triggerViolation('Tab switch detected');
+            }
+        });
+
+        window.addEventListener('blur', () => {
+            triggerViolation('Window focus lost');
+        });
+
+        // Block Right-Click and Copy/Paste
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('paste', e => e.preventDefault());
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+            }
         }
     </script>
 </body>
